@@ -1,18 +1,40 @@
+# --- IMPORT LIBRARY ---
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from jinja2 import ChoiceLoader, FileSystemLoader # Import penting untuk folder html
 import sqlite3
+import os
 import json
 
+# --- KONFIGURASI APLIKASI ---
 app = Flask(__name__)
+
+# KUNCI RAHASIA (Pilih satu saja, saya pakai yang negara api biar aman)
 app.secret_key = 'rahasia_negara_api'
 
+# --- PENGATURAN LOKASI TEMPLATE (HTML) ---
+# Flask akan mencari HTML di:
+# 1. Folder 'templates' (Prioritas Utama)
+# 2. Folder root/luar (Jika tidak ketemu di templates)
+app.jinja_loader = ChoiceLoader([
+    FileSystemLoader(os.path.join(app.root_path, 'templates')),
+    FileSystemLoader(app.root_path)
+])
+
+# --- KONEKSI DATABASE ---
 def get_db_connection():
+    # Pastikan nama file database sesuai dengan yang ada di folder
     conn = sqlite3.connect('database2.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+# ==========================================
+# RUTE / HALAMAN WEBSITE
+# ==========================================
+
 # --- RUTE 1: LANDING PAGE ---
 @app.route('/')
 def index():
+    # Karena sudah pakai ChoiceLoader, Flask bisa nemu index.html meskipun di luar folder templates
     return render_template('index.html', user=session.get('nama'))
 
 # --- RUTE 2: LOGIN (BISA JURI ATAU PESERTA) ---
@@ -54,7 +76,6 @@ def login():
     return render_template('login.html')
 
 # --- RUTE 3: DASHBOARD KHUSUS JURI ---
-# --- RUTE 3: DASHBOARD KHUSUS JURI (UPDATE) ---
 @app.route('/dashboard')
 def dashboard():
     # Proteksi: Hanya Juri boleh masuk sini
@@ -93,7 +114,6 @@ def dashboard():
     conn.close()
 
     # --- LOGIKA BARU: MEMBUAT LIST UNIK PESERTA ---
-    # Kita butuh ini untuk Modal "Peserta Dinilai" agar nama tidak dobel-dobel
     peserta_unik = []
     seen = set()
     for row in history:
@@ -110,7 +130,7 @@ def dashboard():
                            chart_labels=json.dumps(labels), 
                            chart_values=json.dumps(values), 
                            history=history,
-                           peserta_unik=peserta_unik) # Kirim data baru ini
+                           peserta_unik=peserta_unik)
 
 # --- RUTE TAMBAHAN: INPUT & REVISI NILAI (JURI) ---
 @app.route('/input-nilai', methods=['GET', 'POST'])
@@ -126,7 +146,6 @@ def input_nilai():
     if request.method == 'POST':
         try:
             # Loop data dari form HTML
-            # Format nama input: "skor_[id_peserta]_[round]_[sub]"
             for key, val in request.form.items():
                 if key.startswith('skor_') and val:
                     parts = key.split('_')
