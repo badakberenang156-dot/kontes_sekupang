@@ -84,6 +84,11 @@
             text-align: center;
         }
         .avatar-list { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
+
+        /* --- TAMBAHAN STYLE UNTUK HEADER PROFIL --- */
+        .header-profile-img { width: 40px; height: 40px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; margin-right: 10px; border: 2px solid #be123c; }
+        .interactive-card { cursor: pointer; position: relative; overflow: hidden; transition: all 0.2s; }
+        .interactive-card:hover { box-shadow: 0 5px 15px rgba(190, 18, 60, 0.15) !important; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -124,6 +129,10 @@
                     <a href="{{ url_for('leaderboard_peserta') }}" class="nav-link active shadow-sm">
                         <i class="fas fa-trophy me-2"></i> Leaderboard
                     </a>
+                    
+                    <a href="{{ url_for('profil') }}" class="nav-link text-white bg-transparent">
+                        <i class="fas fa-user-circle me-2"></i> Profil Saya
+                    </a>
 
                     <a href="#" class="nav-link text-white bg-transparent" data-bs-toggle="modal" data-bs-target="#infoModal">
                         <i class="fas fa-info-circle me-2"></i> Info Penilaian
@@ -142,7 +151,19 @@
         </div>
 
         <div class="col-md-10 p-5">
-            <h2 class="fw-bold mb-5 text-center" style="color: #881337;">🏆 Peringkat Sementara</h2>
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0">🏆 Peringkat Sementara</h2>
+                    <p class="text-muted mb-0">Pantau posisi semua peserta secara real-time.</p>
+                </div>
+                
+                <a href="{{ url_for('profil') }}" class="text-decoration-none">
+                    <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm interactive-card">
+                        <img src="{{ url_for('static', filename=user_foto) }}" class="header-profile-img">
+                        <span class="fw-bold text-danger">{{ user }}</span>
+                    </div>
+                </a>
+            </div>
 
             <div class="podium-container">
                 
