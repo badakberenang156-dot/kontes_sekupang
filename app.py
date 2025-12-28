@@ -211,8 +211,20 @@ def dashboard_peserta():
     peserta_id = session['user_id']
     conn = get_db_connection()
 
-    total_skor = conn.execute("SELECT SUM(nilai) FROM penilaian WHERE id_peserta = ?", (peserta_id,)).fetchone()[0] or 0
+    # 1. Total Skor & Rata-rata
+    stats = conn.execute("""
+        SELECT 
+            IFNULL(SUM(nilai), 0) as total,
+            IFNULL(AVG(nilai), 0) as rata_rata,
+            COUNT(nilai) as jumlah_vote
+        FROM penilaian WHERE id_peserta = ?
+    """, (peserta_id,)).fetchone()
     
+    total_skor = stats['total']
+    rata_rata = stats['rata_rata']
+    jumlah_juri = stats['jumlah_vote']
+
+    # 2. Peringkat (Rank)
     query_rank = """
     SELECT id_peserta, RANK() OVER (ORDER BY SUM(nilai) DESC) as peringkat 
     FROM penilaian GROUP BY id_peserta
@@ -220,6 +232,7 @@ def dashboard_peserta():
     ranks = conn.execute(query_rank).fetchall()
     my_rank = next((r['peringkat'] for r in ranks if r['id_peserta'] == peserta_id), "-")
 
+    # 3. Chart Data
     chart_data = conn.execute("""
         SELECT j.nama_juri, SUM(pn.nilai) as total_dari_juri
         FROM penilaian pn JOIN juri j ON pn.id_juri = j.id_juri
@@ -229,13 +242,28 @@ def dashboard_peserta():
     labels = [row['nama_juri'] for row in chart_data]
     values = [row['total_dari_juri'] for row in chart_data]
 
+    # 4. (BARU) Detail Rincian Nilai untuk Tabel
+    detail_nilai = conn.execute("""
+        SELECT j.id_juri, pn.round, pn.sub_round, pn.nilai
+        FROM penilaian pn 
+        JOIN juri j ON pn.id_juri = j.id_juri
+        WHERE pn.id_peserta = ?
+        ORDER BY pn.round DESC, pn.sub_round ASC
+    """, (peserta_id,)).fetchall()
+
     conn.close()
 
     return render_template('dashboard_peserta.html', 
                            user=session.get('nama'), 
                            user_foto=session.get('foto'),
-                           total_skor=total_skor, my_rank=my_rank,
-                           chart_labels=json.dumps(labels), chart_values=json.dumps(values))
+                           total_skor=total_skor, 
+                           my_rank=my_rank,
+                           rata_rata=rata_rata,      # Kirim data baru
+                           jumlah_juri=jumlah_juri,  # Kirim data baru
+                           detail_nilai=detail_nilai,# Kirim data baru
+                           chart_labels=json.dumps(labels), 
+                           chart_values=json.dumps(values),
+                           peserta=conn.execute("SELECT * FROM peserta WHERE id_peserta = ?", (peserta_id,)).fetchone()) # Ambil data lengkap peserta buat profil
 
 # --- RUTE TAMBAHAN: LEADERBOARD PESERTA ---
 @app.route('/leaderboard-peserta')

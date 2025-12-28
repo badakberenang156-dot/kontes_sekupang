@@ -4,106 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Peserta</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         body { background-color: #fff1f2; font-family: 'Poppins', sans-serif; }
-        .sidebar { background: linear-gradient(180deg, #be123c 0%, #881337 100%); min-height: 100vh; color: white; }
-        .stat-card { background: white; border-radius: 15px; padding: 25px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
-        .nav-link:hover { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); }
-        .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; font-weight: bold; }
-        
-        /* CLASS PENTING: AGAR FOTO FOKUS KE WAJAH */
-        .face-zoom {
-            object-fit: cover;
-            object-position: 50% 5%; /* Fokus ke 5% dari atas (Wajah) */
+        /* Sidebar Styling */
+        .sidebar {
+            background: linear-gradient(180deg, #be123c 0%, #881337 100%); 
+            min-height: 100vh;
+            color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
+        .nav-link { color: rgba(255,255,255,0.8); margin-bottom: 5px; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); }
+        
+        /* Main Content */
+        .main-content { padding: 30px; }
+        
+        /* Profile Card (Kiri) */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        .profile-img-large {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            object-position: 50% 5%; /* ZOOM WAJAH */
+            border-radius: 50%;
+            border: 5px solid #be123c;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(190, 18, 60, 0.3);
+        }
+
+        /* Foto kecil di Header */
+        .header-profile-img {
+            width: 40px; height: 40px;
+            object-fit: cover;
+            object-position: 50% 5%; /* ZOOM WAJAH */
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #be123c;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: white; border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .score-display { font-size: 2.5rem; font-weight: bold; color: #be123c; }
+
+        /* Tabel Skor */
+        .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
+        
         <div class="col-md-2 sidebar p-4">
             <h4 class="mb-4 text-center"><i class="fas fa-crown"></i> PESERTA</h4>
             <nav class="nav flex-column">
-                <a href="{{ url_for('dashboard_peserta') }}" class="nav-link active">
-                    <i class="fas fa-chart-line me-2"></i> Statistik Saya
-                </a>
-                <a href="{{ url_for('leaderboard_peserta') }}" class="nav-link">
-                    <i class="fas fa-trophy me-2"></i> Leaderboard
-                </a>
-                <hr>
-                <a href="{{ url_for('logout') }}" class="nav-link text-warning">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                </a>
+                <a href="#" class="nav-link active"><i class="fas fa-home me-2"></i> Dashboard Saya</a>
+                <a href="{{ url_for('leaderboard_peserta') }}" class="nav-link"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+                <hr class="text-white-50">
+                <a href="{{ url_for('logout') }}" class="nav-link text-warning"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
             </nav>
         </div>
 
-        <div class="col-md-10 p-5">
+        <div class="col-md-10 main-content">
             
-            <div class="d-flex align-items-center mb-4">
-                <img src="{{ url_for('static', filename=user_foto) }}" alt="Foto Profil" 
-                     class="rounded-circle me-3 face-zoom" 
-                     style="width: 80px; height: 80px; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                
+            <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h2 class="fw-bold mb-0">Halo, {{ user }}! 🌟</h2>
-                    <p class="text-muted mb-0">Selamat datang di dashboard Anda.</p>
+                    <h2 class="fw-bold text-dark">Dashboard Peserta</h2>
+                    <p class="text-muted mb-0">Pantau perolehan nilaimu secara real-time.</p>
+                </div>
+                <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm">
+                    <img src="{{ url_for('static', filename=user_foto) }}" class="header-profile-img">
+                    <span class="fw-bold text-danger">{{ user }}</span>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="stat-card d-flex align-items-center bg-white">
-                        <div class="display-4 text-danger me-3"><i class="fas fa-trophy"></i></div>
-                        <div>
-                            <h6 class="text-muted">Peringkat Saat Ini</h6>
-                            <h1 class="fw-bold">#{{ my_rank }}</h1>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="profile-card">
+                        <img src="{{ url_for('static', filename=user_foto) }}" class="profile-img-large">
+                        
+                        <h3 class="fw-bold">{{ user }}</h3>
+                        <p class="text-muted badge bg-light text-dark border mt-2 mb-3">Peserta Kontes</p>
+                        
+                        <div class="alert alert-danger bg-opacity-10 border-0">
+                            <small class="text-uppercase text-danger fw-bold">Peringkat Saat Ini</small>
+                            <h1 class="display-3 fw-bold text-danger mb-0">#{{ my_rank }}</h1>
+                        </div>
+
+                        <hr class="my-4">
+                        <div class="text-start">
+                            <small class="text-muted d-block mb-1">Total Poin:</small>
+                            <h2 class="fw-bold text-dark">{{ total_skor }}</h2>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="stat-card d-flex align-items-center bg-white">
-                        <div class="display-4 text-success me-3"><i class="fas fa-star"></i></div>
-                        <div>
-                            <h6 class="text-muted">Total Skor Diterima</h6>
-                            <h1 class="fw-bold">{{ total_skor }}</h1>
+
+                <div class="col-md-8">
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">Rata-rata Nilai</h6>
+                                        <div class="score-display">{{ "%.2f"|format(rata_rata) }}</div>
+                                    </div>
+                                    <i class="fas fa-chart-pie fa-3x text-danger opacity-25"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">Vote Masuk</h6>
+                                        <div class="score-display text-warning">{{ jumlah_juri }}</div>
+                                    </div>
+                                    <i class="fas fa-vote-yea fa-3x text-warning opacity-25"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="table-container mb-4">
+                        <h5 class="fw-bold mb-3">Grafik Dukungan Juri</h5>
+                        <div style="height: 200px;">
+                            <canvas id="pesertaChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-list-alt me-2"></i>Log Penilaian Masuk</h5>
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Juri</th>
+                                        <th>Ronde</th>
+                                        <th>Sesi (Sub)</th>
+                                        <th class="text-center">Nilai</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for nilai in detail_nilai %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary rounded-pill">Juri #{{ nilai['id_juri'] }}</span>
+                                        </td>
+                                        <td>Round {{ nilai['round'] }}</td>
+                                        <td>Sub {{ nilai['sub_round'] }}</td>
+                                        <td class="text-center">
+                                            {% if nilai['nilai'] >= 4 %}
+                                                <span class="badge bg-success fs-6">{{ nilai['nilai'] }}</span>
+                                            {% elif nilai['nilai'] == 3 %}
+                                                <span class="badge bg-warning text-dark fs-6">{{ nilai['nilai'] }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger fs-6">{{ nilai['nilai'] }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Belum ada penilaian yang masuk.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <div class="stat-card">
-                <h5 class="fw-bold mb-3">Sumber Dukungan (Perolehan Poin per Juri)</h5>
-                <canvas id="pesertaChart" height="100"></canvas>
-            </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('pesertaChart').getContext('2d');
-    
-    // Menggunakan JSON.parse sesuai format kamu sebelumnya
-    const labelsData = JSON.parse('{{ chart_labels | safe }}');
-    const valuesData = JSON.parse('{{ chart_values | safe }}');
-
     new Chart(ctx, {
         type: 'bar', 
         data: {
-            labels: labelsData,
+            labels: JSON.parse('{{ chart_labels | safe }}'),
             datasets: [{
-                label: 'Poin Diberikan',
-                data: valuesData,
-                backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56'],
+                label: 'Poin',
+                data: JSON.parse('{{ chart_values | safe }}'),
+                backgroundColor: ['#be123c', '#fbbf24', '#f43f5e', '#881337'],
                 borderRadius: 5
             }]
         },
-        options: { responsive: true }
+        options: { 
+            responsive: true,
+            maintainAspectRatio: false, // Agar bisa diatur tingginya
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
     });
 </script>
 </body>
