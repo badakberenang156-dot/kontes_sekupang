@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input & Revisi Nilai</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar sama dengan Dashboard Juri */
+        .sidebar { background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%); min-height: 100vh; color: white; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
+        .nav-link:hover { background-color: rgba(255,255,255,0.2); color: white; }
+        .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; font-weight: bold; }
+
+        /* Card Style */
+        .card-peserta {
+            background: white; border-radius: 15px; border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .foto-peserta { width: 60px; height: 60px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; border: 2px solid #4F46E5; }
+        
+        /* Input Style */
+        .input-nilai { 
+            width: 60px; text-align: center; border: 1px solid #ddd; 
+            border-radius: 8px; padding: 5px; font-weight: bold; color: #4F46E5;
+        }
+        .input-nilai:focus { outline: none; border-color: #4F46E5; background-color: #eef2ff; }
+        
+        /* Header Tabel */
+        .th-round { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
+        
+        .btn-save {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #4F46E5; color: white; padding: 15px 30px;
+            border-radius: 50px; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+            font-weight: bold; font-size: 1.1rem; border: none; z-index: 100;
+        }
+        .btn-save:hover { background: #4338ca; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-4">
+            <h4 class="mb-4 text-center"><i class="fas fa-gavel"></i> JURI APP</h4>
+            <nav class="nav flex-column">
+                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie me-2"></i> Dashboard</a>
+                <a href="{{ url_for('input_nilai') }}" class="nav-link active"><i class="fas fa-edit me-2"></i> Input Nilai</a>
+                <hr>
+                <a href="{{ url_for('logout') }}" class="nav-link text-warning"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+            </nav>
+        </div>
+
+        <div class="col-md-10 p-5" style="padding-bottom: 100px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark">Form Penilaian</h2>
+                    <p class="text-muted">Isi atau ubah nilai peserta di bawah ini. Jangan lupa tekan Simpan.</p>
+                </div>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ 'success' if category=='success' else 'danger' }} py-2 px-4 mb-0">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+            </div>
+
+            <form action="{{ url_for('input_nilai') }}" method="POST">
+                
+                {% for p in peserta %}
+                <div class="card-peserta p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename=p['foto'] if p['foto'] else 'default.jpg') }}" class="foto-peserta me-3">
+                        <h4 class="fw-bold mb-0">{{ p['nama_peserta'] }}</h4>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="th-round bg-light">Sesi</th>
+                                    <th class="th-round">Sub 1</th>
+                                    <th class="th-round">Sub 2</th>
+                                    <th class="th-round">Sub 3</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in range(1, 4) %}
+                                <tr>
+                                    <td class="fw-bold text-center align-middle bg-light">Round {{ r }}</td>
+                                    {% for s in range(1, 4) %}
+                                    <td class="text-center p-2">
+                                        <input type="number" 
+                                               name="skor_{{p['id_peserta']}}_{{r}}_{{s}}" 
+                                               class="input-nilai" 
+                                               min="1" max="5" 
+                                               value="{{ existing_scores.get((p['id_peserta'], r, s), '') }}"
+                                               placeholder="-">
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save me-2"></i> SIMPAN SEMUA REVISI
+                </button>
+
+            </form>
+            </div>
+    </div>
+</div>
+
+</body>
+</html>

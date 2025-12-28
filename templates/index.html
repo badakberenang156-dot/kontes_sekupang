@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontes Keanggunan Sekupang</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-crown me-2"></i> KONTES SEKUPANG</div>
+        <div class="nav-links">
+            <a href="/">Beranda</a>
+            {% if user %}
+                {% if session.get('role') == 'juri' %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard Juri</a>
+                {% else %}
+                    <a href="{{ url_for('dashboard_peserta') }}">Dashboard Saya</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn-login" style="background: #ef4444; border-color: #ef4444; color: white;">LOGOUT</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">LOGIN</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <header class="hero-container">
+        
+        <div class="decoration-circle"></div>
+
+        <div class="hero-left">
+            
+            <div class="text-wrapper active" id="text-default">
+                <h1>IDOLA <br><span>PARA KARBIT</span></h1>
+                <p>
+                    Saksikan pesona 3 kontestan teratas yang memperebutkan gelar
+                    paling anggun di Sekupang. Arahkan kursor ke foto di sebelah kanan
+                    untuk melihat detail mereka.
+                </p>
+                {% if not user %}
+                    <a href="{{ url_for('login') }}" class="btn-cta">MASUK SEKARANG</a>
+                {% else %}
+                    <a href="{{ session.get('role') == 'juri' and url_for('dashboard') or url_for('dashboard_peserta') }}" class="btn-cta">BUKA DASHBOARD</a>
+                {% endif %}
+            </div>
+
+            <div class="text-wrapper" id="text-mai">
+                <h1>MAI <br><span>SAKURAJIMA</span></h1>
+                <p>
+                    Artis papan atas yang sempat menghilang dari pandangan orang biasa.
+                    Dengan aura kedewasaan dan keanggunan alaminya, Mai siap
+                    menghipnotis para juri dengan tatapan tajamnya.
+                </p>
+                <div class="btn-cta">✨ Peserta #01</div>
+            </div>
+
+            <div class="text-wrapper" id="text-teto">
+                <h1>TETO <br></h1>
+                <p>
+                    Virtual singer yang terkenal setelah lebih dari 30 tahun karirnya, 
+                    Awalnya diciptakan sebagai parodi/troll vocaloid bernama utau,
+                    Serta merupakan chimera.
+                </p>
+                <div class="btn-cta">🎲 Peserta #02</div>
+            </div>
+
+            <div class="text-wrapper" id="text-vladilena">
+                <h1>VLADILENA <br><span>MILIZÉ</span></h1>
+                <p>
+                    Sang "Bloody Regina" yang memimpin dengan ketegasan dan kelembutan hati.
+                    Rambut peraknya berkilau melambangkan harapan di tengah medan
+                    pertempuran kontes kecantikan ini.
+                </p>
+                <div class="btn-cta">⚔️ Peserta #03</div>
+            </div>
+
+        </div>
+
+        <div class="hero-right">
+            
+            <div class="hero-right">
+    
+    <div class="card bg-mai" 
+            onmouseenter="showPeserta('mai')" 
+            onmouseleave="resetView()">
+            
+            <video class="card-video video-mai" src="{{ url_for('static', filename='mai.mp4') }}" muted loop playsinline></video>
+
+            <div class="card-info">
+                <h3>Mai Sakurajima</h3>
+                <p>Bunny Girl Senpai</p>
+            </div>
+    </div>
+
+    <div class="card bg-teto" 
+            onmouseenter="showPeserta('teto')" 
+            onmouseleave="resetView()">
+            
+            <video class="card-video video-teto" src="{{ url_for('static', filename='teto.mp4') }}" muted loop playsinline></video>
+
+            <div class="card-info">
+                <h3>Teto</h3>
+                <p>Chimera Style</p>
+            </div>
+    </div>
+
+    <div class="card bg-vladilena" 
+            onmouseenter="showPeserta('vladilena')" 
+            onmouseleave="resetView()">
+            
+            <video class="card-video video-vladilena" src="{{ url_for('static', filename='vladilena.mp4') }}" muted loop playsinline></video>
+
+            <div class="card-info">
+                <h3>Vladilena Milizé</h3>
+                <p>Handler One</p>
+            </div>
+    </div>
+
+</div>
+
+    </header>
+
+    <footer>
+        <div style="font-size: 0.9rem;">&copy; 2026 Kontes Keanggunan Sekupang By Nandito</div>
+        <div class="socials">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        function showPeserta(nama) {
+            // Sembunyikan semua teks
+            document.querySelectorAll('.text-wrapper').forEach(el => el.classList.remove('active'));
+            // Munculkan teks target
+            const target = document.getElementById('text-' + nama);
+            if (target) target.classList.add('active');
+        }
+
+        function resetView() {
+            // Sembunyikan semua teks
+            document.querySelectorAll('.text-wrapper').forEach(el => el.classList.remove('active'));
+            // Kembali ke default
+            document.getElementById('text-default').classList.add('active');
+        }
+
+        // --- LOGIKA VIDEO PLAYER (AUTO PLAY/PAUSE) ---
+        const cards = document.querySelectorAll('.card');
+
+        cards.forEach(card => {
+            const video = card.querySelector('video');
+
+            if (video) {
+                // Saat mouse masuk: Play video
+                card.addEventListener('mouseenter', () => {
+                    video.play();
+                });
+
+                // Saat mouse keluar: Pause video & Reset ke awal
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                    video.currentTime = 0; // Reset ke detik 0 agar transisi mulus nanti
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>

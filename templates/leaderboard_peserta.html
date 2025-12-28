@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard Peserta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #fff1f2; font-family: 'Poppins', sans-serif; }
+        
+        /* Sidebar Pink Theme */
+        .sidebar { background: linear-gradient(180deg, #be123c 0%, #881337 100%); min-height: 100vh; color: white; }
+        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; border-radius: 8px; margin-bottom: 5px; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; font-weight: bold; }
+
+        /* Podium Container */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Supaya rata bawah */
+            height: 350px;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        /* Kotak Podium */
+        .podium-item {
+            text-align: center;
+            width: 160px;
+            position: relative;
+            margin: 0 10px;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .podium-item:hover { transform: scale(1.05); }
+
+        /* Tinggi Podium */
+        .rank-1 { height: 100%; background: linear-gradient(to bottom, #fbbf24, #d97706); z-index: 2; } /* Emas */
+        .rank-2 { height: 80%; background: linear-gradient(to bottom, #9ca3af, #4b5563); } /* Perak */
+        .rank-3 { height: 65%; background: linear-gradient(to bottom, #fdba74, #ea580c); } /* Perunggu */
+
+        /* Foto di atas podium */
+        .avatar-podium {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            margin-bottom: 15px;
+            position: absolute;
+            top: -40px; left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* List Sisanya */
+        .list-rank-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .list-rank-item:hover { transform: translateX(5px); }
+        .rank-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #be123c;
+            width: 40px;
+            text-align: center;
+        }
+        .avatar-list { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-4">
+            <h4 class="mb-4 text-center"><i class="fas fa-crown"></i> PESERTA</h4>
+            <nav class="nav flex-column">
+                <a href="{{ url_for('dashboard_peserta') }}" class="nav-link"><i class="fas fa-chart-line me-2"></i> Statistik Saya</a>
+                <a href="{{ url_for('leaderboard_peserta') }}" class="nav-link active"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+                <hr>
+                <a href="{{ url_for('logout') }}" class="nav-link text-warning"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+            </nav>
+        </div>
+
+        <div class="col-md-10 p-5">
+            <h2 class="fw-bold mb-5 text-center" style="color: #881337;">🏆 Peringkat Sementara</h2>
+
+            <div class="podium-container">
+                
+                {% if juara2 %}
+                <div class="podium-item rank-2">
+                    <img src="{{ url_for('static', filename=juara2['foto'] if juara2['foto'] else 'teto.jpg') }}" 
+                         class="avatar-podium" 
+                         style="object-position: top center !important;">
+                         
+                    <h5 class="fw-bold mt-5">{{ juara2['nama_peserta'] }}</h5>
+                    <div class="badge bg-light text-dark mb-2">Skor: {{ juara2['total_skor'] }}</div>
+                    <h1 class="display-4 fw-bold mb-0">2</h1>
+                </div>
+                {% endif %}
+
+                {% if juara1 %}
+                <div class="podium-item rank-1">
+                    <img src="{{ url_for('static', filename=juara1['foto'] if juara1['foto'] else 'mai.jpg') }}" 
+                         class="avatar-podium" 
+                         style="width: 100px; height: 100px; top: -50px; border-color: #fbbf24; object-position: top center !important;">
+                         
+                    <h4 class="fw-bold mt-5">{{ juara1['nama_peserta'] }}</h4>
+                    <div class="badge bg-light text-dark mb-2">Skor: {{ juara1['total_skor'] }}</div>
+                    <h1 class="display-3 fw-bold mb-0">1</h1>
+                </div>
+                {% endif %}
+
+                {% if juara3 %}
+                <div class="podium-item rank-3">
+                    <img src="{{ url_for('static', filename=juara3['foto'] if juara3['foto'] else 'vladilena.jpg') }}" 
+                         class="avatar-podium"
+                         style="object-position: top center !important;">
+                         
+                    <h5 class="fw-bold mt-5">{{ juara3['nama_peserta'] }}</h5>
+                    <div class="badge bg-light text-dark mb-2">Skor: {{ juara3['total_skor'] }}</div>
+                    <h1 class="display-4 fw-bold mb-0">3</h1>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <h5 class="mb-3 text-muted">Peserta Lainnya</h5>
+                    
+                    {% for p in sisanya %}
+                    <div class="list-rank-item">
+                        <div class="rank-number">{{ loop.index + 3 }}</div>
+                        <img src="{{ url_for('static', filename=p['foto'] if p['foto'] else 'default.jpg') }}" 
+                             class="avatar-list"
+                             style="object-position: top center !important;">
+                             
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-0">{{ p['nama_peserta'] }}</h6>
+                            <small class="text-muted">Semangat terus!</small>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="fw-bold text-danger mb-0">{{ p['total_skor'] }}</h5>
+                            <small class="text-muted">Poin</small>
+                        </div>
+                    </div>
+                    {% else %}
+                        {% if not juara1 %}
+                            <p class="text-center text-muted">Belum ada data skor masuk.</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Masuk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        
+        body {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; 
+        }
+
+        .login-card {
+            background: white;
+            padding: 20px 40px 40px 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        
+        .mascot-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 110px;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        
+        .char-orange {
+            width: 70px; height: 60px; background: #FB923C;
+            border-radius: 40px 40px 0 0; position: relative;
+            animation: bounce 3s infinite ease-in-out;
+            transform-origin: bottom; 
+            transition: all 0.5s ease; /* Transisi halus saat muncul kembali */
+        }
+        .char-orange .eyes {
+            display: flex; gap: 12px; position: absolute; top: 40%; left: 50%; transform: translateX(-50%);
+        }
+        .char-orange .eye { background: #111; }
+
+        
+        .char-black {
+            width: 40px; height: 80px; background: #1F2937;
+            border-radius: 20px 20px 0 0; position: relative;
+            animation: bounce 3.5s infinite ease-in-out 0.5s;
+            transform-origin: bottom;
+            transition: all 0.5s ease;
+        }
+        .char-black .eyes {
+            display: flex; gap: 6px; position: absolute; top: 35%; left: 50%; transform: translateX(-50%);
+        }
+
+        
+        .char-blue {
+            width: 55px; height: 100px; background: #4F46E5;
+            border-radius: 12px 12px 0 0; position: relative;
+            animation: bounce 4s infinite ease-in-out 1s;
+            transform-origin: bottom;
+            transition: all 0.5s ease;
+        }
+        .char-blue .eyes {
+            display: flex; gap: 10px; position: absolute; top: 30%; left: 50%; transform: translateX(-50%);
+        }
+
+        
+        .char-yellow {
+            width: 40px; height: 40px; background: #FACC15;
+            border-radius: 50%; position: relative;
+            animation: bounce 2.5s infinite ease-in-out 0.2s;
+            transform-origin: bottom;
+            transition: all 0.5s ease;
+        }
+        .char-yellow .eyes {
+            display: flex; gap: 5px; position: absolute; top: 40%; left: 50%; transform: translateX(-50%);
+        }
+        .char-yellow .eye { width: 5px; height: 5px; background: #111; }
+
+        
+        .eye {
+            width: 7px; height: 7px; background: white; border-radius: 50%;
+            transition: transform 0.2s ease-out;
+        }
+        
+        .shy-eyes .eye {
+            transform: translateY(-8px) !important;
+            background: #333; height: 3px;
+        }
+
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.02); }
+        }
+
+        
+        @keyframes melt {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scaleY(0.4) scaleX(1.3) translateY(20px); opacity: 0.8; }
+            100% { transform: scaleY(0.1) scaleX(1.5) translateY(50px); opacity: 0; }
+        }
+        
+        
+        .melting {
+            animation: melt 0.8s forwards !important;
+        }
+
+        
+        h3 { color: #333; }
+        p { font-size: 0.9rem; }
+
+        .form-control {
+            background: #f3f4f6; border: 2px solid transparent; padding: 12px; border-radius: 10px; margin-bottom: 15px; transition: 0.3s;
+        }
+        .form-control:focus {
+            background: #fff; border-color: #4F46E5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-login {
+            background: #4F46E5; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+        .btn-login:hover {
+            background: #4338ca; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .back-link {
+            display: block; margin-top: 20px; color: #6b7280; text-decoration: none; font-size: 0.9rem; transition: 0.3s;
+        }
+        .back-link:hover { color: #4F46E5; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        
+        <div class="mascot-container">
+            <div class="char-orange mascot">
+                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            </div>
+            <div class="char-black mascot">
+                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            </div>
+            <div class="char-blue mascot">
+                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            </div>
+            <div class="char-yellow mascot">
+                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            </div>
+        </div>
+        <h3 class="fw-bold mb-1">Selamat Datang</h3>
+        <p class="text-muted mb-4">Silakan masuk untuk melanjutkan sebagai juri atau peserta</p>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div id="errorMessageContainer">
+                    {% for message in messages %}
+                    <div class="alert alert-danger p-2 small mb-3 rounded-3 border-0 bg-danger bg-opacity-10 text-danger">
+                        <i class="fas fa-exclamation-circle me-1"></i> {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
+            <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Password" required>
+            
+            <button type="submit" class="btn-login">MASUK SEKARANG</button>
+        </form>
+
+        <a href="/" class="back-link"><i class="fas fa-arrow-left me-1"></i> Kembali ke Beranda</a>
+    </div>
+
+    <script>
+        const eyes = document.querySelectorAll('.eye');
+        const mascotContainer = document.querySelector('.mascot-container');
+        const passwordInput = document.getElementById('passwordInput');
+        
+        let isPasswordActive = false; 
+
+        
+        const errorContainer = document.getElementById('errorMessageContainer');
+        if (errorContainer) {
+            const mascots = document.querySelectorAll('.mascot');
+            
+            
+            mascots.forEach(mascot => {
+                mascot.classList.add('melting');
+            });
+
+            
+            setTimeout(() => {
+                mascots.forEach(mascot => {
+                    
+                    mascot.classList.remove('melting');
+                
+                });
+            }, 2500);
+        }
+
+        
+        passwordInput.addEventListener('focus', () => {
+            isPasswordActive = true;
+            mascotContainer.classList.add('shy-eyes'); 
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            isPasswordActive = false;
+            mascotContainer.classList.remove('shy-eyes'); 
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isPasswordActive) return;
+            
+            
+            if (document.querySelector('.melting')) return;
+
+            eyes.forEach(eye => {
+                if(eye.classList.contains('blinking')) return;
+
+                const rect = eye.getBoundingClientRect();
+                const eyeCenterX = rect.left + rect.width / 2;
+                const eyeCenterY = rect.top + rect.height / 2;
+
+                const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+                const distance = Math.min(6, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 10);
+
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+
+                eye.style.transform = `translate(${x}px, ${y}px)`;
+                
+                eye.dataset.x = x;
+                eye.dataset.y = y;
+            });
+        });
+
+        
+        function blinkEyes() {
+            // Jangan kedip kalau lagi ngetik atau lagi meleleh
+            if (isPasswordActive || document.querySelector('.melting')) {
+                setTimeout(blinkEyes, 2000);
+                return; 
+            }
+
+            eyes.forEach(eye => {
+                eye.classList.add('blinking');
+                const x = eye.dataset.x || 0;
+                const y = eye.dataset.y || 0;
+                eye.style.transform = `translate(${x}px, ${y}px) scaleY(0.1)`;
+            });
+
+            setTimeout(() => {
+                eyes.forEach(eye => {
+                    eye.classList.remove('blinking');
+                    const x = eye.dataset.x || 0;
+                    const y = eye.dataset.y || 0;
+                    eye.style.transform = `translate(${x}px, ${y}px) scaleY(1)`;
+                });
+            }, 200);
+
+            setTimeout(blinkEyes, Math.random() * 3000 + 2000);
+        }
+
+        blinkEyes();
+    </script>
+
+</body>
+</html>

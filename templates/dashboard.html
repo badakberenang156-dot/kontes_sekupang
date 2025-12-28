@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Juri</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%);
+            min-height: 100vh;
+            color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar-brand { font-size: 1.5rem; font-weight: bold; padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-link { color: rgba(255,255,255,0.8); margin-bottom: 5px; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); }
+        .nav-link i { margin-right: 10px; width: 20px; text-align: center; }
+
+        /* Main Content Styling */
+        .main-content { padding: 30px; }
+        .header-welcome { margin-bottom: 30px; }
+        
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .clickable-card { cursor: pointer; transition: all 0.3s ease; }
+        .clickable-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(79, 70, 229, 0.2); border: 1px solid #4F46E5; }
+        .clickable-card::after { content: 'Klik untuk detail'; position: absolute; bottom: 10px; right: 20px; font-size: 0.7rem; color: #aaa; opacity: 0; transition: 0.3s; }
+        .clickable-card:hover::after { opacity: 1; }
+
+        .icon-box {
+            width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; margin-bottom: 15px;
+        }
+        
+        /* Table */
+        .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%; }
+        .custom-table th { background-color: #f8f9fa; border-bottom: 2px solid #e9ecef; }
+        
+        /* Style Modal Peserta */
+        .modal-peserta-img { width: 50px; height: 50px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; border: 2px solid #4F46E5; }
+
+        /* --- CSS KHUSUS UNTUK MENCETAK (PRINTING) --- */
+        @media print {
+            /* 1. Sembunyikan semua elemen body kecuali modal */
+            body * { visibility: hidden; }
+            #modalRataRata, #modalRataRata * { visibility: visible; }
+
+            /* 2. Reset posisi modal agar jadi halaman penuh */
+            #modalRataRata {
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                height: auto;
+                margin: 0; padding: 0;
+                background: white !important;
+                border: none !important;
+                overflow: visible !important; /* Biarkan konten tumpah ke halaman berikutnya */
+            }
+
+            .modal-dialog {
+                max-width: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .modal-content {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* 3. PENTING: Buka Scroll agar semua data tercetak */
+            .table-responsive {
+                max-height: none !important; /* Hapus batasan tinggi */
+                overflow: visible !important; /* Hapus scrollbar */
+                height: auto !important;
+            }
+
+            /* 4. Sembunyikan tombol & elemen hiasan */
+            .no-print, .btn-close, .btn-secondary { display: none !important; }
+            
+            /* 5. Rapikan tabel untuk kertas */
+            .table { border: 1px solid #000 !important; width: 100% !important; }
+            .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
+            
+            /* Hapus background warna badge agar hemat tinta & jelas */
+            .badge { 
+                background: none !important; 
+                color: #000 !important; 
+                border: 1px solid #000 !important;
+                padding: 2px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-0">
+            <div class="sidebar-brand"><i class="fas fa-vote-yea me-2"></i>JURI APP</div>
+            <div class="p-3">
+                <nav class="nav flex-column">
+                    <a href="#" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                    <a href="{{ url_for('input_nilai') }}" class="nav-link"><i class="fas fa-edit"></i> Input Nilai</a> 
+                    <hr class="text-white-50">
+                    <a href="{{ url_for('logout') }}" class="nav-link text-danger bg-white bg-opacity-10"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center header-welcome">
+                <div>
+                    <h2 class="fw-bold text-dark">Dashboard Penilaian</h2>
+                    <p class="text-muted mb-0">Halo, <strong>{{ user }}</strong>! Berikut performa penilaian Anda.</p>
+                </div>
+                <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm">
+                    <img src="https://ui-avatars.com/api/?name={{ user }}&background=random" class="rounded-circle me-2" width="35">
+                    <span class="fw-bold text-primary">{{ user }}</span>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="stat-card clickable-card" data-bs-toggle="modal" data-bs-target="#modalPeserta">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1">Peserta Dinilai</h6>
+                                <h2 class="fw-bold mb-0">{{ metrics['total_peserta'] }} <small class="fs-6 text-muted">Orang</small></h2>
+                            </div>
+                            <div class="icon-box" style="background: #4F46E5;"><i class="fas fa-users"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card clickable-card" data-bs-toggle="modal" data-bs-target="#modalRataRata">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1">Rata-rata Skor</h6>
+                                <h2 class="fw-bold mb-0">{{ "%.1f"|format(metrics['rata_rata']) }} <small class="fs-6 text-muted">/ 5.0</small></h2>
+                            </div>
+                            <div class="icon-box" style="background: #10B981;"><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1">Total Poin</h6>
+                                <h2 class="fw-bold mb-0">{{ metrics['total_poin'] }} <small class="fs-6 text-muted">Poin</small></h2>
+                            </div>
+                            <div class="icon-box" style="background: #F59E0B;"><i class="fas fa-bolt"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="stat-card h-100">
+                        <h5 class="fw-bold mb-4">Grafik Sebaran Nilai Anda</h5>
+                        <canvas id="scoreChart" height="150"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="table-container">
+                        <h5 class="fw-bold mb-3">Riwayat Penilaian</h5>
+                        <div style="overflow-y: auto; max-height: 350px;">
+                            <table class="table custom-table table-hover">
+                                <thead style="position: sticky; top: 0; background: white;">
+                                    <tr>
+                                        <th>Peserta</th>
+                                        <th>Sesi</th>
+                                        <th class="text-center">Nilai</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in history %}
+                                    <tr>
+                                        <td class="fw-bold">{{ row['nama_peserta'] }}</td>
+                                        <td><span class="badge bg-light text-dark border">R{{ row['round'] }}.{{ row['sub_round'] }}</span></td>
+                                        <td class="text-center fw-bold text-primary">{{ row['nilai'] }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="3" class="text-center text-muted">Belum ada data.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPeserta" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-users me-2"></i>Daftar Peserta Dinilai</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="list-group">
+                    {% for p in peserta_unik %}
+                    <div class="list-group-item d-flex align-items-center border-0 mb-2 shadow-sm rounded">
+                        <img src="{{ url_for('static', filename=p['foto']) }}" class="modal-peserta-img me-3">
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">{{ p['nama'] }}</h6>
+                            <small class="text-success"><i class="fas fa-check-circle me-1"></i>Sudah dinilai</small>
+                        </div>
+                    </div>
+                    {% else %}
+                        <p class="text-center text-muted">Belum ada peserta.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRataRata" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-file-alt me-2"></i>Laporan Rincian Skor</h5>
+                
+                <button onclick="window.print()" class="btn btn-light btn-sm ms-auto no-print me-2">
+                    <i class="fas fa-print me-1"></i> Cetak / Simpan PDF
+                </button>
+                <button type="button" class="btn-close btn-close-white no-print" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">Laporan Penilaian Juri</h3>
+                    <p class="text-muted">Juri: {{ user }}</p>
+                </div>
+
+                <div class="alert alert-light border-success text-success text-center mb-4">
+                    <strong>Rata-rata Skor: {{ "%.2f"|format(metrics['rata_rata']) }}</strong>
+                    <br><small>Analisis distribusi nilai.</small>
+                </div>
+                
+                <h6 class="fw-bold mb-3">Detail Semua Skor:</h6>
+                
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Peserta</th>
+                                <th>Round</th>
+                                <th>Sub</th>
+                                <th class="text-center">Skor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in history %}
+                            <tr>
+                                <td>{{ row['nama_peserta'] }}</td>
+                                <td>{{ row['round'] }}</td>
+                                <td>{{ row['sub_round'] }}</td>
+                                <td class="text-center fw-bold">
+                                    {% if row['nilai'] >= 4 %}
+                                        <span class="badge bg-success text-white border border-success">{{ row['nilai'] }}</span>
+                                    {% elif row['nilai'] == 3 %}
+                                        <span class="badge bg-warning text-dark border border-warning">{{ row['nilai'] }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger text-white border border-danger">{{ row['nilai'] }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-5 text-end">
+                    <p class="mb-5">Batam, {{  metrics['total_poin'] | replace(metrics['total_poin'], "2026") }}</p>
+                    <br><br>
+                    <p class="fw-bold text-decoration-underline">{{ user }}</p>
+                    <p class="text-muted small">Juri Penilai</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    const labels = {{ chart_labels | safe }};
+    const dataValues = {{ chart_values | safe }};
+    const scoreChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Poin',
+                data: dataValues,
+                backgroundColor: '#4F46E5',
+                borderRadius: 5,
+                barThickness: 30
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
