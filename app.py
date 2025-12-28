@@ -211,7 +211,10 @@ def dashboard_peserta():
     peserta_id = session['user_id']
     conn = get_db_connection()
 
-    # 1. Total Skor & Rata-rata
+    # 1. Ambil Data Profil
+    peserta_info = conn.execute("SELECT * FROM peserta WHERE id_peserta = ?", (peserta_id,)).fetchone()
+
+    # 2. Statistik Umum
     stats = conn.execute("""
         SELECT 
             IFNULL(SUM(nilai), 0) as total,
@@ -224,7 +227,7 @@ def dashboard_peserta():
     rata_rata = stats['rata_rata']
     jumlah_juri = stats['jumlah_vote']
 
-    # 2. Peringkat (Rank)
+    # 3. Peringkat
     query_rank = """
     SELECT id_peserta, RANK() OVER (ORDER BY SUM(nilai) DESC) as peringkat 
     FROM penilaian GROUP BY id_peserta
@@ -232,24 +235,34 @@ def dashboard_peserta():
     ranks = conn.execute(query_rank).fetchall()
     my_rank = next((r['peringkat'] for r in ranks if r['id_peserta'] == peserta_id), "-")
 
-    # 3. Chart Data
+    # 4. Chart Data
     chart_data = conn.execute("""
         SELECT j.nama_juri, SUM(pn.nilai) as total_dari_juri
         FROM penilaian pn JOIN juri j ON pn.id_juri = j.id_juri
         WHERE pn.id_peserta = ? GROUP BY j.nama_juri
     """, (peserta_id,)).fetchall()
-
     labels = [row['nama_juri'] for row in chart_data]
     values = [row['total_dari_juri'] for row in chart_data]
 
-    # 4. (BARU) Detail Rincian Nilai untuk Tabel
+    # 5. Detail Nilai
     detail_nilai = conn.execute("""
-        SELECT j.id_juri, pn.round, pn.sub_round, pn.nilai
+        SELECT j.nama_juri, pn.round, pn.sub_round, pn.nilai
         FROM penilaian pn 
         JOIN juri j ON pn.id_juri = j.id_juri
         WHERE pn.id_peserta = ?
         ORDER BY pn.round DESC, pn.sub_round ASC
     """, (peserta_id,)).fetchall()
+
+    # --- LOGIKA BARU: Hitung Rata-rata Per Ronde untuk Progress Bar ---
+    # Kita filter data dari 'detail_nilai' yang sudah diambil di atas
+    def hitung_avg_ronde(ronde_ke):
+        nilai_ronde = [d['nilai'] for d in detail_nilai if d['round'] == ronde_ke]
+        if not nilai_ronde: return 0
+        return sum(nilai_ronde) / len(nilai_ronde)
+
+    avg_r1 = hitung_avg_ronde(1)
+    avg_r2 = hitung_avg_ronde(2)
+    avg_r3 = hitung_avg_ronde(3)
 
     conn.close()
 
@@ -258,12 +271,17 @@ def dashboard_peserta():
                            user_foto=session.get('foto'),
                            total_skor=total_skor, 
                            my_rank=my_rank,
-                           rata_rata=rata_rata,      # Kirim data baru
-                           jumlah_juri=jumlah_juri,  # Kirim data baru
-                           detail_nilai=detail_nilai,# Kirim data baru
+                           rata_rata=rata_rata,
+                           jumlah_juri=jumlah_juri,
+                           detail_nilai=detail_nilai,
                            chart_labels=json.dumps(labels), 
                            chart_values=json.dumps(values),
-                           peserta=conn.execute("SELECT * FROM peserta WHERE id_peserta = ?", (peserta_id,)).fetchone()) # Ambil data lengkap peserta buat profil
+                           peserta=peserta_info,
+                           
+                           # --- TAMBAHKAN 3 BARIS INI YANG HILANG DI SCREENSHOT ---
+                           avg_r1=avg_r1, 
+                           avg_r2=avg_r2, 
+                           avg_r3=avg_r3)
 
 # --- RUTE TAMBAHAN: LEADERBOARD PESERTA ---
 @app.route('/leaderboard-peserta')
@@ -272,9 +290,11 @@ def leaderboard_peserta():
         return redirect(url_for('login'))
 
     conn = get_db_connection()
+    peserta_id = session['user_id'] # Ambil ID kita
     
     query = """
     SELECT 
+        p.id_peserta,
         p.nama_peserta, 
         p.foto, 
         IFNULL(SUM(pn.nilai), 0) as total_skor
@@ -286,6 +306,18 @@ def leaderboard_peserta():
     data = conn.execute(query).fetchall()
     conn.close()
 
+    # --- LOGIKA BARU: Cari Peringkat Saya untuk Widget Sidebar ---
+    my_rank = "-"
+    my_score = 0
+    
+    # Loop data yang sudah urut skor tertinggi
+    for index, p in enumerate(data):
+        if p['id_peserta'] == peserta_id:
+            my_rank = index + 1
+            my_score = p['total_skor']
+            break # Ketemu, berhenti loop
+            
+    # Pisahkan 3 Besar dan Sisanya
     top3 = data[:3]
     rest = data[3:]
 
@@ -293,8 +325,12 @@ def leaderboard_peserta():
     juara2 = top3[1] if len(top3) > 1 else None
     juara3 = top3[2] if len(top3) > 2 else None
 
+    # Kirim data tambahan (my_rank, total_skor, user_foto) ke HTML
     return render_template('leaderboard_peserta.html', 
                            user=session.get('nama'),
+                           user_foto=session.get('foto'), # Butuh untuk sidebar
+                           my_rank=my_rank,               # Butuh untuk widget
+                           total_skor=my_score,           # Butuh untuk widget
                            juara1=juara1, juara2=juara2, juara3=juara3,
                            sisanya=rest)
 
