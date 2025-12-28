@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya - Idola Karbit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #fff1f2; font-family: 'Poppins', sans-serif; }
+        .card-profile { border: none; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); overflow: hidden; }
+        .header-bg { background: linear-gradient(135deg, #be123c 0%, #881337 100%); height: 150px; }
+        .profile-img-wrap { margin-top: -75px; text-align: center; }
+        .profile-img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-primary { background-color: #be123c; border-color: #be123c; }
+        .btn-primary:hover { background-color: #9f1239; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <a href="{{ url_for('dashboard_peserta') }}" class="btn btn-outline-danger mb-4 rounded-pill px-4">
+        <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card card-profile">
+                <div class="header-bg"></div>
+                <div class="card-body px-5 pb-5">
+                    <div class="profile-img-wrap mb-4">
+                        <img src="{{ url_for('static', filename=user['foto']) }}" class="profile-img" alt="Foto Profil">
+                        </div>
+
+                    <h3 class="text-center fw-bold mb-1">{{ user['username'] }}</h3>
+                    <p class="text-center text-muted mb-4">Peserta Idola Karbit</p>
+
+                    <form action="{{ url_for('profil') }}" method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Nama Lengkap</label>
+                                <input type="text" name="nama" class="form-control form-control-lg" value="{{ user['username'] }}" required>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Password Baru <small class="text-muted fw-normal">(Kosongkan jika tidak ingin mengganti)</small></label>
+                                <input type="password" name="password" class="form-control form-control-lg" placeholder="******">
+                            </div>
+
+                            <div class="col-md-12 mt-4">
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+                                    <i class="fas fa-save me-2"></i> Simpan Perubahan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

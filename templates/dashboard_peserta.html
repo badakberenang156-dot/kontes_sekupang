@@ -18,90 +18,117 @@
             color: white;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
-        .nav-link { 
-            color: rgba(255,255,255,0.8); 
-            margin-bottom: 5px; 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            transition: all 0.3s; 
-            cursor: pointer;
-        }
-        .nav-link:hover, .nav-link.active-tab { 
-            background-color: rgba(255,255,255,0.2); 
-            color: white; 
-            transform: translateX(5px); 
-            font-weight: bold;
-        }
+        .nav-link { color: rgba(255,255,255,0.8); margin-bottom: 5px; padding: 12px 20px; border-radius: 8px; transition: all 0.3s; cursor: pointer; }
+        .nav-link:hover, .nav-link.active-tab { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); font-weight: bold; }
         
         .main-content { padding: 30px; }
         
-        /* Profile Card */
-        .profile-card {
-            background: white; border-radius: 20px; padding: 30px;
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            height: 100%;
-        }
-        .profile-img-large {
-            width: 150px; height: 150px; object-fit: cover; object-position: 50% 5%; 
-            border-radius: 50%; border: 5px solid #be123c; margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(190, 18, 60, 0.3);
-        }
-        .header-profile-img {
-            width: 40px; height: 40px; object-fit: cover; object-position: 50% 5%;
-            border-radius: 50%; margin-right: 10px; border: 2px solid #be123c;
-        }
-
-        /* Stat Cards */
-        .stat-card {
-            background: white; border-radius: 15px; padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+        /* Profile & Cards */
+        .profile-card { background: white; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); height: 100%; }
+        .profile-img-large { width: 150px; height: 150px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; border: 5px solid #be123c; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(190, 18, 60, 0.3); }
+        .header-profile-img { width: 40px; height: 40px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; margin-right: 10px; border: 2px solid #be123c; }
+        .stat-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none; transition: transform 0.2s, box-shadow 0.2s; }
         .stat-card:hover { transform: translateY(-5px); }
         
-        /* Interactive Cards */
+        /* Interactive Elements */
         .interactive-card { cursor: pointer; position: relative; overflow: hidden; }
         .interactive-card:hover { box-shadow: 0 10px 20px rgba(190, 18, 60, 0.15); border: 1px solid rgba(190, 18, 60, 0.2); }
-        .interactive-card::after {
-            content: '\f0a9'; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; top: 10px; right: 10px; opacity: 0; transition: opacity 0.2s; color: #be123c;
-        }
+        .interactive-card::after { content: '\f0a9'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 10px; right: 10px; opacity: 0; transition: opacity 0.2s; color: #be123c; }
         .interactive-card:hover::after { opacity: 1; }
-
         .score-display { font-size: 2.5rem; font-weight: bold; color: #be123c; }
         .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
-        /* Timeline Styles */
+        
+        /* Timeline */
         .timeline-item { position: relative; padding-left: 30px; margin-bottom: 15px; }
-        .timeline-item::before {
-            content: ''; position: absolute; left: 0; top: 5px;
-            width: 12px; height: 12px; border-radius: 50%; background: #dee2e6;
-        }
+        .timeline-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #dee2e6; }
         .timeline-item.active::before { background: #198754; box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2); }
         .timeline-item.current::before { background: #ffc107; box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2); }
-        .timeline-item:not(:last-child)::after {
-            content: ''; position: absolute; left: 5px; top: 17px;
-            width: 2px; height: 100%; background: #e9ecef;
-        }
-
-        .fade-in { animation: fadeIn 0.5s; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 5px; top: 17px; width: 2px; height: 100%; background: #e9ecef; }
         
-        .chart-highlight-box {
-            border-left: 4px solid #be123c; background: #fff5f7; padding: 15px; border-radius: 0 10px 10px 0;
-        }
+        .fade-in { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chart-highlight-box { border-left: 4px solid #be123c; background: #fff5f7; padding: 15px; border-radius: 0 10px 10px 0; }
 
-        /* --- MODE CETAK (PRINT) --- */
+        /* =========================================
+           FIX UTAMA: MODE CETAK SPREADSHEET 
+           ========================================= */
         @media print {
-            .sidebar, .profile-card, .btn-print, .nav, .modal, .chart-highlight-box, #view-ringkasan, #view-grafik { display: none !important; }
-            .main-content { margin: 0; padding: 0; width: 100%; }
-            body { background-color: white; }
-            .table-container { box-shadow: none; border: 1px solid #ddd; }
-            .table-responsive { overflow: visible !important; height: auto !important; max-height: none !important; }
-            #view-log { display: block !important; }
+            /* 1. Sembunyikan elemen web biasa */
+            body * { visibility: hidden; }
+            .sidebar, .main-content, .modal-header, .modal-footer, .btn-close, .btn { display: none !important; }
+            
+            /* 2. Tampilkan HANYA area print */
+            #printableArea, #printableArea * { visibility: visible; }
+            
+            /* 3. Reset Posisi & Ukuran Modal agar FULL PAGE */
+            #detailModal {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                overflow: visible !important; /* KUNCI: Biarkan konten tumpah keluar */
+            }
+            
+            .modal-dialog {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                transform: none !important;
+            }
+            
+            .modal-content {
+                border: none !important;
+                box-shadow: none !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            /* 4. JEBOLKAN SCROLLING (PENTING!) */
+            /* Ini yang bikin tabelnya bisa memanjang ke bawah berlembar-lembar */
+            .modal-body, .modal-dialog-scrollable .modal-body {
+                overflow: visible !important;
+                max-height: none !important;
+                height: auto !important;
+                display: block !important;
+            }
+            
+            .table-responsive {
+                overflow: visible !important;
+                display: block !important;
+            }
+
+            /* 5. TABLE STYLE EXCEL (GARIS TEGAS) */
+            .table-print {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 2px solid #000 !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 11pt !important;
+                margin-top: 20px;
+            }
+            
+            .table-print th, .table-print td {
+                border: 1px solid #000 !important;
+                padding: 8px 12px !important;
+                color: #000 !important;
+            }
+            
+            .table-print thead th {
+                background-color: #d1d5db !important; /* Abu-abu Excel */
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                text-align: center;
+                font-weight: bold;
+                border-bottom: 2px solid #000 !important;
+            }
+
+            /* Agar baris tabel tidak terpotong di tengah halaman */
+            tr { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -113,21 +140,25 @@
         <div class="col-md-2 sidebar p-4 d-flex flex-column justify-content-between">
             <div>
                 <h4 class="mb-4 text-center fw-bold"><i class="fas fa-crown text-warning me-2"></i>PESERTA</h4>
-                
                 <div class="card border-0 bg-white bg-opacity-10 text-white mb-4 p-3 rounded-3 text-center">
                     <small class="text-uppercase opacity-75" style="font-size: 0.7rem;">Peringkat Saat Ini</small>
                     <h2 class="fw-bold mb-0 text-warning">#{{ my_rank }}</h2>
                     <small class="text-light">{{ total_skor }} Poin</small>
                 </div>
-
+                
                 <nav class="nav flex-column gap-2">
                     <p class="text-white-50 text-uppercase fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 1px;">Menu Utama</p>
                     <a onclick="showTab('ringkasan')" class="nav-link active-tab" id="btn-ringkasan"><i class="fas fa-chart-line me-2"></i> Ringkasan</a>
                     <a onclick="showTab('grafik')" class="nav-link" id="btn-grafik"><i class="fas fa-chart-bar me-2"></i> Grafik Vote</a>
                     <a onclick="showTab('log')" class="nav-link" id="btn-log"><i class="fas fa-list-ol me-2"></i> Log Nilai</a>
+                    
                     <div class="my-2 border-top border-white opacity-25"></div>
+                    
                     <p class="text-white-50 text-uppercase fw-bold mb-1 mt-2" style="font-size: 0.75rem; letter-spacing: 1px;">Kompetisi</p>
                     <a href="{{ url_for('leaderboard_peserta') }}" class="nav-link text-white bg-transparent"><i class="fas fa-trophy me-2"></i> Leaderboard</a>
+                    
+                    <a href="{{ url_for('profil') }}" class="nav-link text-white bg-transparent"><i class="fas fa-user-circle me-2"></i> Profil Saya</a>
+                    
                     <a href="#" class="nav-link text-white bg-transparent" data-bs-toggle="modal" data-bs-target="#infoModal"><i class="fas fa-info-circle me-2"></i> Info Penilaian</a>
                 </nav>
             </div>
@@ -138,16 +169,18 @@
         </div>
 
         <div class="col-md-10 main-content">
-            
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h2 class="fw-bold text-dark">Dashboard Peserta</h2>
                     <p class="text-muted mb-0">Pantau perolehan nilaimu secara real-time.</p>
                 </div>
-                <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm">
-                    <img src="{{ url_for('static', filename=user_foto) }}" class="header-profile-img">
-                    <span class="fw-bold text-danger">{{ user }}</span>
-                </div>
+                
+                <a href="{{ url_for('profil') }}" class="text-decoration-none">
+                    <div class="d-flex align-items-center bg-white px-3 py-2 rounded-pill shadow-sm interactive-card">
+                        <img src="{{ url_for('static', filename=user_foto) }}" class="header-profile-img">
+                        <span class="fw-bold text-danger">{{ user }}</span>
+                    </div>
+                </a>
             </div>
 
             <div class="row">
@@ -161,10 +194,7 @@
                             <h1 class="display-3 fw-bold text-danger mb-0">#{{ my_rank }}</h1>
                         </div>
                         <hr class="my-4">
-                        <div class="text-start">
-                            <small class="text-muted d-block mb-1">Total Poin:</small>
-                            <h2 class="fw-bold text-dark">{{ total_skor }}</h2>
-                        </div>
+                        <div class="text-start"><small class="text-muted d-block mb-1">Total Poin:</small><h2 class="fw-bold text-dark">{{ total_skor }}</h2></div>
                     </div>
                 </div>
 
@@ -172,140 +202,85 @@
                     
                     <div id="view-ringkasan" class="tab-content fade-in">
                         <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <div class="stat-card interactive-card" onclick="showTab('log')" title="Klik untuk lihat detail nilai">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div><h6 class="text-muted text-uppercase mb-1">Rata-rata Nilai</h6><div class="score-display">{{ "%.2f"|format(rata_rata) }}</div><small class="text-primary" style="font-size: 0.7rem;">Lihat Detail <i class="fas fa-arrow-right ms-1"></i></small></div>
-                                        <i class="fas fa-chart-pie fa-3x text-danger opacity-25"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="stat-card interactive-card" onclick="showTab('grafik')" title="Klik untuk lihat grafik">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div><h6 class="text-muted text-uppercase mb-1">Vote Masuk</h6><div class="score-display text-warning">{{ jumlah_juri }}</div><small class="text-primary" style="font-size: 0.7rem;">Lihat Grafik <i class="fas fa-arrow-right ms-1"></i></small></div>
-                                        <i class="fas fa-vote-yea fa-3x text-warning opacity-25"></i>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="col-md-6"><div class="stat-card interactive-card" onclick="showTab('log')"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">Rata-rata Nilai</h6><div class="score-display">{{ "%.2f"|format(rata_rata) }}</div><small class="text-primary">Lihat Detail <i class="fas fa-arrow-right"></i></small></div><i class="fas fa-chart-pie fa-3x text-danger opacity-25"></i></div></div></div>
+                            <div class="col-md-6"><div class="stat-card interactive-card" onclick="showTab('grafik')"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">Vote Masuk</h6><div class="score-display text-warning">{{ jumlah_juri }}</div><small class="text-primary">Lihat Grafik <i class="fas fa-arrow-right"></i></small></div><i class="fas fa-vote-yea fa-3x text-warning opacity-25"></i></div></div></div>
                         </div>
-
-                        <div class="stat-card interactive-card mb-4" onclick="showTab('log')" title="Klik untuk lihat rincian per ronde">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="fw-bold text-dark mb-0"><i class="fas fa-tachometer-alt me-2 text-secondary"></i>Performa Ronde</h5>
-                                <small class="text-primary">Cek Rincian <i class="fas fa-chevron-right ms-1"></i></small>
+                        
+                        <div class="stat-card interactive-card mb-4" onclick="showTab('log')">
+                            <h5 class="fw-bold mb-3"><i class="fas fa-tachometer-alt me-2 text-secondary"></i>Performa Ronde</h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 1</small><small class="fw-bold text-success">{{ "%.1f"|format(avg_r1) }}/5.0</small></div>
+                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-success" style="width: {{ (avg_r1 / 5) * 100 }}%"></div></div>
                             </div>
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 1 </small><small class="fw-bold text-success">{{ "%.1f"|format(avg_r1) }}/5.0</small></div>
-                                <div class="progress" style="height: 10px; background-color: #e9ecef;"><div class="progress-bar bg-success" style="width: {{ (avg_r1 / 5) * 100 }}%"></div></div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 2 </small><small class="fw-bold text-warning">{{ "%.1f"|format(avg_r2) }}/5.0</small></div>
-                                <div class="progress" style="height: 10px; background-color: #e9ecef;"><div class="progress-bar bg-warning" style="width: {{ (avg_r2 / 5) * 100 }}%"></div></div>
+                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 2</small><small class="fw-bold text-warning">{{ "%.1f"|format(avg_r2) }}/5.0</small></div>
+                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-warning" style="width: {{ (avg_r2 / 5) * 100 }}%"></div></div>
                             </div>
                             <div>
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 3 </small><small class="fw-bold text-danger">{{ "%.1f"|format(avg_r3) }}/5.0</small></div>
-                                <div class="progress" style="height: 10px; background-color: #e9ecef;"><div class="progress-bar bg-danger" style="width: {{ (avg_r3 / 5) * 100 }}%"></div></div>
+                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 3</small><small class="fw-bold text-danger">{{ "%.1f"|format(avg_r3) }}/5.0</small></div>
+                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-danger" style="width: {{ (avg_r3 / 5) * 100 }}%"></div></div>
                             </div>
                         </div>
 
                         <div class="row g-3">
-                            <div class="col-md-7">
-                                <div class="stat-card h-100">
-                                    <h6 class="text-muted text-uppercase mb-3 fw-bold">Pencapaian & Badge</h6>
-                                    <div class="d-flex justify-content-around text-center mt-4">
-                                        <div class="position-relative">
-                                            <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2" style="width: 60px; height: 60px;">
-                                                {% if my_rank != '-' and my_rank|int <= 3 %}<i class="fas fa-trophy fa-2x text-warning"></i>{% else %}<i class="fas fa-trophy fa-2x text-muted opacity-25"></i>{% endif %}
-                                            </div>
-                                            <small class="d-block fw-bold" style="font-size: 0.8rem;">Top 3</small>
-                                        </div>
-                                        <div>
-                                            <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2" style="width: 60px; height: 60px;">
-                                                {% if rata_rata >= 4.0 %}<i class="fas fa-fire fa-2x text-danger"></i>{% else %}<i class="fas fa-fire fa-2x text-muted opacity-25"></i>{% endif %}
-                                            </div>
-                                            <small class="d-block fw-bold" style="font-size: 0.8rem;">Hot Shot</small>
-                                        </div>
-                                        <div>
-                                            <div class="bg-light rounded-circle d-flex justify-content-center align-items-center mx-auto mb-2" style="width: 60px; height: 60px;">
-                                                {% if jumlah_juri >= 50 %}<i class="fas fa-star fa-2x text-primary"></i>{% else %}<i class="fas fa-star fa-2x text-muted opacity-25"></i>{% endif %}
-                                            </div>
-                                            <small class="d-block fw-bold" style="font-size: 0.8rem;">Favorit</small>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 text-center">
-                                        <small class="text-muted fst-italic" style="font-size: 0.7rem;">Terus tingkatkan performamu!</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="stat-card h-100">
-                                    <h6 class="text-muted text-uppercase mb-3 fw-bold">Status Kompetisi</h6>
-                                    <div class="ps-1">
-                                        <div class="timeline-item active"><small class="d-block fw-bold text-success">Registrasi</small><small class="text-muted" style="font-size: 0.7rem;">Selesai</small></div>
-                                        <div class="timeline-item active"><small class="d-block fw-bold text-success">Audisi Awal</small><small class="text-muted" style="font-size: 0.7rem;">Lolos</small></div>
-                                        <div class="timeline-item active"><small class="d-block fw-bold text-success">Grand Final</small><small class="text-muted" style="font-size: 0.7rem;">Selesai</small></div>
-                                        <div class="timeline-item current"><small class="d-block fw-bold text-danger">Pengumuman</small><small class="text-dark fw-bold badge bg-warning bg-opacity-25 text-dark" style="font-size: 0.65rem;">Segera Dirilis</small></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="col-md-7"><div class="stat-card h-100"><h6 class="text-muted text-uppercase mb-3 fw-bold">Pencapaian</h6><div class="d-flex justify-content-around text-center mt-4"><div><i class="fas fa-trophy fa-2x text-warning mb-2"></i><br><small class="fw-bold">Top 3</small></div><div><i class="fas fa-fire fa-2x text-danger mb-2"></i><br><small class="fw-bold">Hot Shot</small></div><div><i class="fas fa-star fa-2x text-primary mb-2"></i><br><small class="fw-bold">Favorit</small></div></div></div></div>
+                            <div class="col-md-5"><div class="stat-card h-100"><h6 class="text-muted text-uppercase mb-3 fw-bold">Status</h6><div class="ps-1"><div class="timeline-item active"><small class="text-success fw-bold">Registrasi</small></div><div class="timeline-item active"><small class="text-success fw-bold">Grand Final</small></div><div class="timeline-item current"><small class="text-danger fw-bold">Pengumuman</small></div></div></div></div>
                         </div>
                     </div>
 
                     <div id="view-grafik" class="tab-content fade-in d-none">
                         <div class="row g-3 mb-4">
-                            <div class="col-md-4"><div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-success text-center"><small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Dukungan Tertinggi</small><div id="highest-score-text" class="fw-bold text-success mt-1">-</div><small id="highest-score-val" class="text-muted" style="font-size: 0.8rem;">0 Poin</small></div></div>
-                            <div class="col-md-4"><div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-danger text-center"><small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Dukungan Terendah</small><div id="lowest-score-text" class="fw-bold text-danger mt-1">-</div><small id="lowest-score-val" class="text-muted" style="font-size: 0.8rem;">0 Poin</small></div></div>
-                            <div class="col-md-4"><div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-primary text-center"><small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Partisipasi Juri</small><div id="total-juri-val" class="fw-bold text-primary mt-1">-</div><small class="text-muted" style="font-size: 0.8rem;">Sudah Menilai</small></div></div>
+                            <div class="col-md-4">
+                                <div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-success text-center h-100 d-flex flex-column justify-content-center">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Dukungan Tertinggi</small>
+                                    <div id="highest-score-text" class="fw-bold text-success mt-1">-</div>
+                                    <small id="highest-score-val">0</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-danger text-center h-100 d-flex flex-column justify-content-center">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Dukungan Terendah</small>
+                                    <div id="lowest-score-text" class="fw-bold text-danger mt-1">-</div>
+                                    <small id="lowest-score-val">0</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="bg-white p-3 rounded-3 shadow-sm border-bottom border-4 border-primary text-center h-100 d-flex flex-column justify-content-center">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Partisipasi Juri</small>
+                                    <div id="total-juri-val" class="fw-bold text-primary mt-1">-</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="table-container mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="fw-bold mb-0">Grafik Dukungan Juri</h5><span class="badge bg-danger">Visualisasi</span></div>
-                            <div style="height: 300px;"><canvas id="pesertaChart"></canvas></div>
-                        </div>
-                        <div class="chart-highlight-box mb-3 d-flex align-items-start">
-                            <i class="fas fa-lightbulb text-danger mt-1 me-3 fa-lg"></i>
-                            <div><h6 class="fw-bold text-danger mb-1">Analisis Singkat:</h6><p class="mb-0 text-muted small">Grafik di atas menunjukkan sebaran dukungan dari para juri. Juri dengan batang tertinggi adalah pendukung terkuatmu!</p></div>
-                        </div>
+                        <div class="table-container mb-4"><h5 class="fw-bold mb-3">Grafik Dukungan</h5><div style="height: 300px;"><canvas id="pesertaChart"></canvas></div></div>
                     </div>
 
                     <div id="view-log" class="tab-content fade-in d-none">
                         <div class="table-container">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold mb-0"><i class="fas fa-list-alt me-2"></i>Log Penilaian Masuk</h5>
-                                
-                                <div>
-                                    <button class="btn btn-sm btn-outline-secondary btn-print me-2" onclick="window.print()">
-                                        <i class="fas fa-print me-1"></i> Cetak Laporan
-                                    </button>
-                                    <span class="badge bg-primary">Detail</span>
-                                </div>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal">
+                                    <i class="fas fa-expand me-1"></i> Lihat Detail & Cetak
+                                </button>
                             </div>
                             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                 <table class="table table-hover align-middle">
                                     <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th>Juri</th>
-                                            <th>Ronde</th>
-                                            <th>Sesi (Sub)</th>
-                                            <th class="text-center">Nilai</th>
-                                        </tr>
+                                        <tr><th>Juri</th><th>Ronde</th><th>Sub</th><th class="text-center">Nilai</th></tr>
                                     </thead>
                                     <tbody>
                                         {% for nilai in detail_nilai %}
                                         <tr>
-                                            <td>
-                                                <span class="badge bg-secondary rounded-pill">{{ nilai['nama_juri'] }}</span>
-                                            </td>
+                                            <td><span class="badge bg-secondary rounded-pill">{{ nilai['nama_juri'] }}</span></td>
                                             <td>Round {{ nilai['round'] }}</td>
                                             <td>Sub {{ nilai['sub_round'] }}</td>
                                             <td class="text-center">
-                                                {% if nilai['nilai'] >= 4 %}<span class="badge bg-success fs-6">{{ nilai['nilai'] }}</span>
-                                                {% elif nilai['nilai'] == 3 %}<span class="badge bg-warning text-dark fs-6">{{ nilai['nilai'] }}</span>
-                                                {% else %}<span class="badge bg-danger fs-6">{{ nilai['nilai'] }}</span>{% endif %}
+                                                {% if nilai['nilai'] >= 4 %}<span class="badge bg-success">{{ nilai['nilai'] }}</span>
+                                                {% elif nilai['nilai'] == 3 %}<span class="badge bg-warning text-dark">{{ nilai['nilai'] }}</span>
+                                                {% else %}<span class="badge bg-danger">{{ nilai['nilai'] }}</span>{% endif %}
                                             </td>
                                         </tr>
                                         {% else %}
-                                        <tr><td colspan="4" class="text-center py-4 text-muted">Belum ada penilaian yang masuk.</td></tr>
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">Belum ada penilaian.</td></tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
@@ -319,44 +294,98 @@
     </div>
 </div>
 
-<div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header bg-danger text-white"><h5 class="modal-title fw-bold"><i class="fas fa-info-circle me-2"></i>Sistem Penilaian</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p>Halo peserta! Berikut adalah panduan singkat penilaian:</p><ul class="list-group list-group-flush"><li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="fas fa-star text-warning me-2"></i>Rentang Nilai</span><span class="badge bg-primary rounded-pill">1 - 5 Poin</span></li><li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="fas fa-sync text-info me-2"></i>Update Data</span><span class="badge bg-secondary rounded-pill">Real-time</span></li></ul></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button></div></div></div>
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-file-alt me-2"></i>Laporan Hasil Penilaian</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-5" id="printableArea">
+                <div class="text-center mb-4 border-bottom pb-3">
+                    <h3 class="fw-bold mb-1">HASIL PENILAIAN KOMPETISI</h3>
+                    <p class="text-muted mb-0">Idola Karbit 2025 - Official Report</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-2 text-center">
+                        <img src="{{ url_for('static', filename=user_foto) }}" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+                    </div>
+                    <div class="col-10 d-flex flex-column justify-content-center">
+                        <h4 class="fw-bold mb-0">{{ user }}</h4>
+                        <div class="text-muted">ID Peserta: #{{ session['user_id'] }}</div>
+                        <div class="mt-1 d-flex gap-2">
+                            <span class="badge bg-danger rounded-0 border border-dark text-dark bg-opacity-25">Rank #{{ my_rank }}</span>
+                            <span class="badge bg-light rounded-0 border border-dark text-dark">Total: {{ total_skor }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-2 ps-1">Rincian Nilai Masuk:</h5>
+                <div class="table-responsive">
+                    <table class="table-print">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">No</th>
+                                <th>Nama Juri</th>
+                                <th>Ronde Kompetisi</th>
+                                <th>Sub Sesi</th>
+                                <th style="width: 80px;" class="text-center">Nilai</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nilai in detail_nilai %}
+                            <tr>
+                                <td class="text-center">{{ loop.index }}</td>
+                                <td class="fw-bold">{{ nilai['nama_juri'] }}</td>
+                                <td>Ronde {{ nilai['round'] }}</td>
+                                <td>{{ nilai['sub_round'] }}</td>
+                                <td class="text-center fw-bold">{{ nilai['nilai'] }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center">Data tidak tersedia.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-5 pt-4 text-end">
+                    <p class="mb-5">Mengetahui,<br>Panitia Penyelenggara</p>
+                    <p class="fw-bold text-decoration-underline">Admin Idola Karbit</p>
+                </div>
+            </div>
+
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i> Cetak Laporan
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header bg-danger text-white"><h5 class="modal-title">Info Penilaian</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Rentang Nilai: 1-5 Poin (Update Real-time)</p></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button></div></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const rawLabels = '{{ chart_labels | safe }}';
-    const rawValues = '{{ chart_values | safe }}';
-    const labels = JSON.parse(rawLabels);
-    const values = JSON.parse(rawValues);
+    const labels = JSON.parse('{{ chart_labels | safe }}');
+    const values = JSON.parse('{{ chart_values | safe }}');
 
     if (values.length > 0) {
         const maxVal = Math.max(...values);
         const minVal = Math.min(...values);
-        const maxIndex = values.indexOf(maxVal);
-        const minIndex = values.indexOf(minVal);
-
-        document.getElementById('highest-score-text').innerText = labels[maxIndex];
+        document.getElementById('highest-score-text').innerText = labels[values.indexOf(maxVal)];
         document.getElementById('highest-score-val').innerText = maxVal + " Poin";
-        document.getElementById('lowest-score-text').innerText = labels[minIndex];
+        document.getElementById('lowest-score-text').innerText = labels[values.indexOf(minVal)];
         document.getElementById('lowest-score-val').innerText = minVal + " Poin";
         document.getElementById('total-juri-val').innerText = labels.length + " Orang";
-    } else {
-        document.getElementById('highest-score-text').innerText = "-";
-        document.getElementById('lowest-score-text').innerText = "-";
-        document.getElementById('total-juri-val').innerText = "0 Orang";
     }
 
     const ctx = document.getElementById('pesertaChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'bar', 
-        data: {
-            labels: labels,
-            datasets: [{ label: 'Poin', data: values, backgroundColor: ['#be123c', '#fbbf24', '#f43f5e', '#881337'], borderRadius: 5 }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-    });
+    new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Poin', data: values, backgroundColor: ['#be123c', '#fbbf24', '#f43f5e', '#881337'], borderRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
 
     function showTab(tabName) {
         document.getElementById('view-ringkasan').classList.add('d-none');

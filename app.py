@@ -277,8 +277,6 @@ def dashboard_peserta():
                            chart_labels=json.dumps(labels), 
                            chart_values=json.dumps(values),
                            peserta=peserta_info,
-                           
-                           # --- TAMBAHKAN 3 BARIS INI YANG HILANG DI SCREENSHOT ---
                            avg_r1=avg_r1, 
                            avg_r2=avg_r2, 
                            avg_r3=avg_r3)
@@ -333,6 +331,48 @@ def leaderboard_peserta():
                            total_skor=my_score,           # Butuh untuk widget
                            juara1=juara1, juara2=juara2, juara3=juara3,
                            sisanya=rest)
+
+# --- RUTE BARU: HALAMAN PROFIL PESERTA ---
+@app.route('/profil', methods=['GET', 'POST'])
+def profil():
+    # 1. Cek Login sebagai Peserta
+    if 'user_id' not in session or session.get('role') != 'peserta':
+        flash('Silakan login sebagai peserta terlebih dahulu.')
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    peserta_id = session['user_id']
+    
+    # 2. Jika Form Disubmit (POST)
+    if request.method == 'POST':
+        nama_baru = request.form['nama']
+        password_baru = request.form['password']
+        
+        try:
+            if password_baru:
+                # Update Nama & Password
+                conn.execute('UPDATE peserta SET nama_peserta = ?, password = ? WHERE id_peserta = ?', 
+                             (nama_baru, password_baru, peserta_id))
+            else:
+                # Update Nama Saja
+                conn.execute('UPDATE peserta SET nama_peserta = ? WHERE id_peserta = ?', 
+                             (nama_baru, peserta_id))
+            
+            conn.commit()
+            
+            # Update nama di Session agar header langsung berubah
+            session['nama'] = nama_baru
+            
+            flash('Profil berhasil diperbarui!', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Terjadi kesalahan: {e}', 'danger')
+    
+    # 3. Ambil data terbaru untuk ditampilkan di form
+    user = conn.execute('SELECT * FROM peserta WHERE id_peserta = ?', (peserta_id,)).fetchone()
+    conn.close()
+    
+    return render_template('profil_peserta.html', user=user)
 
 # --- RUTE 5: LOGOUT ---
 @app.route('/logout')
