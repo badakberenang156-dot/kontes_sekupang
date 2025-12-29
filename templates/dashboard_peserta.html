@@ -39,19 +39,17 @@
         .table-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
         /* Timeline */
-        .timeline-item { position: relative; padding-left: 30px; margin-bottom: 15px; }
+        .timeline-item { position: relative; padding-left: 30px; margin-bottom: 20px; }
         .timeline-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #dee2e6; }
         .timeline-item.active::before { background: #198754; box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2); }
-        .timeline-item.current::before { background: #ffc107; box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2); }
+        .timeline-item.current::before { background: #dc3545; box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2); }
         .timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 5px; top: 17px; width: 2px; height: 100%; background: #e9ecef; }
         
         .fade-in { animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .chart-highlight-box { border-left: 4px solid #be123c; background: #fff5f7; padding: 15px; border-radius: 0 10px 10px 0; }
 
-        /* =========================================
-           FIX UTAMA: MODE CETAK SPREADSHEET 
-           ========================================= */
+        /* PRINT STYLES */
         @media print {
             body * { visibility: hidden; }
             .sidebar, .main-content, .modal-header, .modal-footer, .btn-close, .btn { display: none !important; }
@@ -157,24 +155,51 @@
                         </div>
                         
                         <div class="stat-card interactive-card mb-4" onclick="showTab('log')">
-                            <h5 class="fw-bold mb-3"><i class="fas fa-tachometer-alt me-2 text-secondary"></i>Performa Ronde</h5>
+                            <h5 class="fw-bold mb-3"><i class="fas fa-tachometer-alt me-2 text-secondary"></i>Performa Penilaian</h5>
+                            
+                            {% for p in performa_kategori %}
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 1</small><small class="fw-bold text-success">{{ "%.1f"|format(avg_r1) }}/5.0</small></div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-success" style="width: {{ (avg_r1 / 5) * 100 }}%"></div></div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="fw-bold text-muted">
+                                        {{ p['nama'] }} 
+                                        <span class="badge bg-light text-secondary border ms-1 rounded-pill" style="font-size: 0.7rem;">Ronde {{ loop.index }}</span>
+                                    </small>
+                                    <small class="fw-bold text-dark">{{ "%.1f"|format(p['avg']) }}/5.0</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {% if loop.index == 1 %}bg-success{% elif loop.index == 2 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         style="width: {{ p['persen'] }}%"></div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 2</small><small class="fw-bold text-warning">{{ "%.1f"|format(avg_r2) }}/5.0</small></div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-warning" style="width: {{ (avg_r2 / 5) * 100 }}%"></div></div>
-                            </div>
-                            <div>
-                                <div class="d-flex justify-content-between mb-1"><small class="fw-bold text-muted">Ronde 3</small><small class="fw-bold text-danger">{{ "%.1f"|format(avg_r3) }}/5.0</small></div>
-                                <div class="progress" style="height: 8px;"><div class="progress-bar bg-danger" style="width: {{ (avg_r3 / 5) * 100 }}%"></div></div>
-                            </div>
+                            {% else %}
+                            <p class="text-muted small text-center py-3">Belum ada kategori penilaian.</p>
+                            {% endfor %}
+                            
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-7"><div class="stat-card h-100"><h6 class="text-muted text-uppercase mb-3 fw-bold">Pencapaian</h6><div class="d-flex justify-content-around text-center mt-4"><div><i class="fas fa-trophy fa-2x text-warning mb-2"></i><br><small class="fw-bold">Top 3</small></div><div><i class="fas fa-fire fa-2x text-danger mb-2"></i><br><small class="fw-bold">Hot Shot</small></div><div><i class="fas fa-star fa-2x text-primary mb-2"></i><br><small class="fw-bold">Favorit</small></div></div></div></div>
-                            <div class="col-md-5"><div class="stat-card h-100"><h6 class="text-muted text-uppercase mb-3 fw-bold">Status</h6><div class="ps-1"><div class="timeline-item active"><small class="text-success fw-bold">Registrasi</small></div><div class="timeline-item active"><small class="text-success fw-bold">Grand Final</small></div><div class="timeline-item current"><small class="text-danger fw-bold">Pengumuman</small></div></div></div></div>
+                            
+                            <div class="col-md-5">
+                                <div class="stat-card h-100">
+                                    <h6 class="text-muted text-uppercase mb-3 fw-bold">Status</h6>
+                                    <div class="ps-1">
+                                        <div class="timeline-item active">
+                                            <div class="text-success fw-bold" style="line-height: 1.2;">Registrasi</div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Selesai</small>
+                                        </div>
+                                        <div class="timeline-item active">
+                                            <div class="text-success fw-bold" style="line-height: 1.2;">Grand Final</div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Selesai</small>
+                                        </div>
+                                        <div class="timeline-item current">
+                                            <div class="text-danger fw-bold" style="line-height: 1.2;">Pengumuman</div>
+                                            <small class="text-danger opacity-75" style="font-size: 0.75rem;">Segera Dirilis</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
 
@@ -244,77 +269,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold"><i class="fas fa-file-alt me-2"></i>Laporan Hasil Penilaian</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            
-            <div class="modal-body p-5" id="printableArea">
-                <div class="text-center mb-4 border-bottom pb-3">
-                    <h3 class="fw-bold mb-1">HASIL PENILAIAN KOMPETISI</h3>
-                    <p class="text-muted mb-0">Idola Karbit 2025 - Official Report</p>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-2 text-center">
-                        <img src="{{ url_for('static', filename=user_foto) }}" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
-                    </div>
-                    <div class="col-10 d-flex flex-column justify-content-center">
-                        <h4 class="fw-bold mb-0">{{ user }}</h4>
-                        <div class="text-muted">ID Peserta: #{{ session['user_id'] }}</div>
-                        <div class="mt-1 d-flex gap-2">
-                            <span class="badge bg-danger rounded-0 border border-dark text-dark bg-opacity-25">Rank #{{ my_rank }}</span>
-                            <span class="badge bg-light rounded-0 border border-dark text-dark">Total: {{ total_skor }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="fw-bold mb-2 ps-1">Rincian Nilai Masuk:</h5>
-                <div class="table-responsive">
-                    <table class="table-print">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;">No</th>
-                                <th>Nama Juri</th>
-                                <th>Ronde Kompetisi</th>
-                                <th>Sub Sesi</th>
-                                <th style="width: 80px;" class="text-center">Nilai</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for nilai in detail_nilai %}
-                            <tr>
-                                <td class="text-center">{{ loop.index }}</td>
-                                <td class="fw-bold">{{ nilai['nama_juri'] }}</td>
-                                <td>Ronde {{ nilai['round'] }}</td>
-                                <td>{{ nilai['sub_round'] }}</td>
-                                <td class="text-center fw-bold">{{ nilai['nilai'] }}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="5" class="text-center">Data tidak tersedia.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-5 pt-4 text-end">
-                    <p class="mb-5">Mengetahui,<br>Panitia Penyelenggara</p>
-                    <p class="fw-bold text-decoration-underline">Admin Idola Karbit</p>
-                </div>
-            </div>
-
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-success" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i> Cetak Laporan
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold"><i class="fas fa-file-alt me-2"></i>Laporan Hasil Penilaian</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-5" id="printableArea"><div class="text-center mb-4 border-bottom pb-3"><h3 class="fw-bold mb-1">HASIL PENILAIAN KOMPETISI</h3><p class="text-muted mb-0">Idola Karbit 2025 - Official Report</p></div><div class="row mb-4"><div class="col-2 text-center"><img src="{{ url_for('static', filename=user_foto) }}" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;"></div><div class="col-10 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-0">{{ user }}</h4><div class="text-muted">ID Peserta: #{{ session['user_id'] }}</div><div class="mt-1 d-flex gap-2"><span class="badge bg-danger rounded-0 border border-dark text-dark bg-opacity-25">Rank #{{ my_rank }}</span><span class="badge bg-light rounded-0 border border-dark text-dark">Total: {{ total_skor }}</span></div></div></div><h5 class="fw-bold mb-2 ps-1">Rincian Nilai Masuk:</h5><div class="table-responsive"><table class="table-print"><thead><tr><th style="width: 50px;">No</th><th>Nama Juri</th><th>Ronde Kompetisi</th><th>Sub Sesi</th><th style="width: 80px;" class="text-center">Nilai</th></tr></thead><tbody>{% for nilai in detail_nilai %}<tr><td class="text-center">{{ loop.index }}</td><td class="fw-bold">{{ nilai['nama_juri'] }}</td><td>Ronde {{ nilai['round'] }}</td><td>{{ nilai['sub_round'] }}</td><td class="text-center fw-bold">{{ nilai['nilai'] }}</td></tr>{% else %}<tr><td colspan="5" class="text-center">Data tidak tersedia.</td></tr>{% endfor %}</tbody></table></div><div class="mt-5 pt-4 text-end"><p class="mb-5">Mengetahui,<br>Panitia Penyelenggara</p><p class="fw-bold text-decoration-underline">Admin Idola Karbit</p></div></div><div class="modal-footer bg-light"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button><button type="button" class="btn btn-success" onclick="window.print()"><i class="fas fa-print me-2"></i> Cetak Laporan</button></div></div></div></div>
 
 <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -378,22 +333,17 @@
                                 <i class="fas fa-list-check me-2"></i>Aspek Penilaian
                             </h6>
                             <ul class="list-group list-group-flush small">
+                                {% for p in performa_kategori %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="fas fa-microphone-alt text-secondary me-2"></i>Teknik Vokal / Skill</span>
-                                    <span class="badge bg-secondary rounded-pill">40%</span>
+                                    <span>
+                                        <i class="fas fa-tag text-secondary me-2"></i>
+                                        {{ p['nama'] }}
+                                    </span>
+                                    <span class="badge bg-secondary rounded-pill">Max 5.0 Poin</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="fas fa-theater-masks text-secondary me-2"></i>Performa & Ekspresi</span>
-                                    <span class="badge bg-secondary rounded-pill">30%</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="fas fa-tshirt text-secondary me-2"></i>Kostum & Kreativitas</span>
-                                    <span class="badge bg-secondary rounded-pill">20%</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="fas fa-heart text-secondary me-2"></i>Interaksi Audiens</span>
-                                    <span class="badge bg-secondary rounded-pill">10%</span>
-                                </li>
+                                {% else %}
+                                <li class="list-group-item text-muted text-center">Belum ada kategori.</li>
+                                {% endfor %}
                             </ul>
                         </div>
 

@@ -1,20 +1,15 @@
 # --- IMPORT LIBRARY ---
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from jinja2 import ChoiceLoader, FileSystemLoader # Import penting untuk folder html
+from jinja2 import ChoiceLoader, FileSystemLoader
 import sqlite3
 import os
 import json
 
 # --- KONFIGURASI APLIKASI ---
 app = Flask(__name__)
-
-# KUNCI RAHASIA (Pilih satu saja, saya pakai yang negara api biar aman)
 app.secret_key = 'rahasia_negara_api'
 
-# --- PENGATURAN LOKASI TEMPLATE (HTML) ---
-# Flask akan mencari HTML di:
-# 1. Folder 'templates' (Prioritas Utama)
-# 2. Folder root/luar (Jika tidak ketemu di templates)
+# Konfigurasi Folder Template
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(app.root_path, 'templates')),
     FileSystemLoader(app.root_path)
@@ -22,22 +17,18 @@ app.jinja_loader = ChoiceLoader([
 
 # --- KONEKSI DATABASE ---
 def get_db_connection():
-    # Pastikan nama file database sesuai dengan yang ada di folder
-    conn = sqlite3.connect('database2.db')
+    conn = sqlite3.connect('database2.db') 
     conn.row_factory = sqlite3.Row
     return conn
 
 # ==========================================
-# RUTE / HALAMAN WEBSITE
+# RUTE UMUM
 # ==========================================
 
-# --- RUTE 1: LANDING PAGE ---
 @app.route('/')
 def index():
-    # Karena sudah pakai ChoiceLoader, Flask bisa nemu index.html meskipun di luar folder templates
     return render_template('index.html', user=session.get('nama'))
 
-# --- RUTE 2: LOGIN (BISA JURI ATAU PESERTA) ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -46,27 +37,34 @@ def login():
         
         conn = get_db_connection()
         
-        # 1. Cek di tabel JURI dulu
+        # 1. Cek ADMIN
+        try:
+            admin = conn.execute('SELECT * FROM admin WHERE username = ?', (username,)).fetchone()
+            if admin and admin['password'] == password:
+                session['user_id'] = admin['id_admin']
+                session['nama'] = admin['nama_lengkap']
+                session['role'] = 'admin'
+                conn.close()
+                return redirect(url_for('dashboard_admin'))
+        except sqlite3.OperationalError:
+            pass
+
+        # 2. Cek JURI
         juri = conn.execute('SELECT * FROM juri WHERE username = ?', (username,)).fetchone()
-        
         if juri and juri['password'] == password:
             session['user_id'] = juri['id_juri']
             session['nama'] = juri['nama_juri']
-            session['role'] = 'juri' # Tandai sebagai Juri
+            session['role'] = 'juri'
             conn.close()
             return redirect(url_for('dashboard'))
             
-        # 2. Kalau bukan Juri, cek tabel PESERTA
+        # 3. Cek PESERTA
         peserta = conn.execute('SELECT * FROM peserta WHERE username = ?', (username,)).fetchone()
-        
         if peserta and peserta['password'] == password:
             session['user_id'] = peserta['id_peserta']
             session['nama'] = peserta['nama_peserta']
-            session['role'] = 'peserta' # Tandai sebagai Peserta
-            
-            # Simpan nama file foto ke session
+            session['role'] = 'peserta'
             session['foto'] = peserta['foto'] if peserta['foto'] else 'default.jpg'
-
             conn.close()
             return redirect(url_for('dashboard_peserta'))
             
@@ -75,310 +73,247 @@ def login():
             
     return render_template('login.html')
 
-# --- RUTE 3: DASHBOARD KHUSUS JURI ---
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+# ==========================================
+# BAGIAN KHUSUS ADMIN
+# ==========================================
+
+@app.route('/admin')
+def dashboard_admin():
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    peserta = conn.execute("SELECT * FROM peserta").fetchall()
+    juri = conn.execute("SELECT * FROM juri").fetchall()
+    try:
+        kategori = conn.execute("SELECT * FROM kategori_nilai").fetchall()
+    except:
+        kategori = []
+    conn.close()
+    return render_template('dashboard_admin.html', peserta=peserta, juri=juri, kategori=kategori)
+
+@app.route('/tambah_peserta', methods=['POST'])
+def tambah_peserta():
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    
+    nama = request.form['nama'].strip()
+    perwakilan = request.form['sekolah']
+    username = request.form['username'].strip().lower()
+    password = request.form['password']
+    foto = 'default.jpg' 
+
+    conn = get_db_connection()
+    try:
+        if conn.execute("SELECT id_peserta FROM peserta WHERE username = ?", (username,)).fetchone():
+            flash(f'Gagal! Username "{username}" sudah dipakai.', 'error')
+            return redirect(url_for('dashboard_admin'))
+        
+        if conn.execute("SELECT id_peserta FROM peserta WHERE nama_peserta = ? COLLATE NOCASE", (nama,)).fetchone():
+            flash(f'Gagal! Nama "{nama}" sudah terdaftar.', 'error')
+            return redirect(url_for('dashboard_admin'))
+
+        conn.execute("INSERT INTO peserta (nama_peserta, perwakilan, username, password, foto) VALUES (?, ?, ?, ?, ?)",
+                     (nama, perwakilan, username, password, foto))
+        conn.commit()
+        flash('Peserta berhasil ditambahkan!', 'success')
+    except Exception as e:
+        flash(f'Terjadi kesalahan: {e}', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('dashboard_admin'))
+
+@app.route('/tambah_juri', methods=['POST'])
+def tambah_juri():
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    nama = request.form['nama'].strip()
+    username = request.form['username'].strip().lower()
+    password = request.form['password']
+    conn = get_db_connection()
+    try:
+        if conn.execute("SELECT id_juri FROM juri WHERE username = ?", (username,)).fetchone():
+            flash(f'Gagal! Username "{username}" sudah dipakai.', 'error')
+            return redirect(url_for('dashboard_admin'))
+        conn.execute("INSERT INTO juri (nama_juri, username, password) VALUES (?, ?, ?)", (nama, username, password))
+        conn.commit()
+        flash('Juri berhasil ditambahkan!', 'success')
+    except Exception as e:
+        flash(f'Terjadi kesalahan: {e}', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('dashboard_admin'))
+
+@app.route('/tambah_kategori', methods=['POST'])
+def tambah_kategori():
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    nama = request.form['nama'].strip()
+    bobot = request.form['bobot']
+    conn = get_db_connection()
+    try:
+        conn.execute("INSERT INTO kategori_nilai (nama_kategori, bobot_persen) VALUES (?, ?)", (nama, bobot))
+        conn.commit()
+        flash('Kategori berhasil ditambahkan!', 'success')
+    except Exception as e:
+        flash(f'Gagal: {e}', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('dashboard_admin'))
+
+@app.route('/hapus_data/<tipe>/<id_data>')
+def hapus_data(tipe, id_data):
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    conn = get_db_connection()
+    try:
+        if tipe == 'peserta': conn.execute("DELETE FROM peserta WHERE id_peserta = ?", (id_data,))
+        elif tipe == 'juri': conn.execute("DELETE FROM juri WHERE id_juri = ?", (id_data,))
+        elif tipe == 'kategori': conn.execute("DELETE FROM kategori_nilai WHERE id_kategori = ?", (id_data,))
+        conn.commit()
+        flash('Data berhasil dihapus!', 'success')
+    except Exception as e:
+        flash(f'Gagal menghapus: {e}', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('dashboard_admin'))
+
+# ==========================================
+# BAGIAN JURI
+# ==========================================
+
 @app.route('/dashboard')
 def dashboard():
-    # Proteksi: Hanya Juri boleh masuk sini
-    if 'user_id' not in session or session.get('role') != 'juri':
-        flash("Akses ditolak! Halaman ini khusus Juri.")
-        return redirect(url_for('login'))
-
+    if 'user_id' not in session or session.get('role') != 'juri': return redirect(url_for('login'))
     juri_id = session['user_id']
     conn = get_db_connection()
-
-    # Metrics Juri
-    metrics = conn.execute("""
-        SELECT COUNT(DISTINCT id_peserta) as total_peserta,
-        IFNULL(AVG(nilai), 0) as rata_rata,
-        IFNULL(SUM(nilai), 0) as total_poin
-        FROM penilaian WHERE id_juri = ?
-    """, (juri_id,)).fetchone()
-
-    # Chart Juri
-    chart_data = conn.execute("""
-        SELECT p.nama_peserta, SUM(pn.nilai) as total_nilai
-        FROM penilaian pn JOIN peserta p ON pn.id_peserta = p.id_peserta
-        WHERE pn.id_juri = ? GROUP BY p.nama_peserta ORDER BY total_nilai DESC
-    """, (juri_id,)).fetchall()
-    
+    metrics = conn.execute("SELECT COUNT(DISTINCT id_peserta) as total_peserta, IFNULL(AVG(nilai), 0) as rata_rata, IFNULL(SUM(nilai), 0) as total_poin FROM penilaian WHERE id_juri = ?", (juri_id,)).fetchone()
+    chart_data = conn.execute("SELECT p.nama_peserta, SUM(pn.nilai) as total_nilai FROM penilaian pn JOIN peserta p ON pn.id_peserta = p.id_peserta WHERE pn.id_juri = ? GROUP BY p.nama_peserta ORDER BY total_nilai DESC", (juri_id,)).fetchall()
+    history = conn.execute("SELECT p.nama_peserta, p.foto, pn.round, pn.sub_round, pn.nilai FROM penilaian pn JOIN peserta p ON pn.id_peserta = p.id_peserta WHERE pn.id_juri = ? ORDER BY pn.round ASC, pn.sub_round ASC", (juri_id,)).fetchall()
+    conn.close()
     labels = [row['nama_peserta'] for row in chart_data]
     values = [row['total_nilai'] for row in chart_data]
-
-    # Riwayat Juri (DITAMBAHKAN p.foto)
-    history = conn.execute("""
-        SELECT p.nama_peserta, p.foto, pn.round, pn.sub_round, pn.nilai
-        FROM penilaian pn JOIN peserta p ON pn.id_peserta = p.id_peserta
-        WHERE pn.id_juri = ? ORDER BY pn.round ASC, pn.sub_round ASC
-    """, (juri_id,)).fetchall()
-    
-    conn.close()
-
-    # --- LOGIKA BARU: MEMBUAT LIST UNIK PESERTA ---
     peserta_unik = []
     seen = set()
     for row in history:
         if row['nama_peserta'] not in seen:
-            peserta_unik.append({
-                'nama': row['nama_peserta'],
-                'foto': row['foto'] if row['foto'] else 'default.jpg'
-            })
+            peserta_unik.append({'nama': row['nama_peserta'], 'foto': row['foto'] if row['foto'] else 'default.jpg'})
             seen.add(row['nama_peserta'])
+    return render_template('dashboard.html', user=session.get('nama'), metrics=metrics, chart_labels=json.dumps(labels), chart_values=json.dumps(values), history=history, peserta_unik=peserta_unik)
 
-    return render_template('dashboard.html', 
-                           user=session.get('nama'), 
-                           metrics=metrics, 
-                           chart_labels=json.dumps(labels), 
-                           chart_values=json.dumps(values), 
-                           history=history,
-                           peserta_unik=peserta_unik)
-
-# --- RUTE TAMBAHAN: INPUT & REVISI NILAI (JURI) ---
 @app.route('/input-nilai', methods=['GET', 'POST'])
 def input_nilai():
-    # Proteksi: Hanya Juri boleh masuk
-    if 'user_id' not in session or session.get('role') != 'juri':
-        return redirect(url_for('login'))
-
+    if 'user_id' not in session or session.get('role') != 'juri': return redirect(url_for('login'))
     conn = get_db_connection()
     juri_id = session['user_id']
-
-    # --- JIKA TOMBOL SIMPAN DITEKAN (POST) ---
     if request.method == 'POST':
         try:
-            # Loop data dari form HTML
             for key, val in request.form.items():
                 if key.startswith('skor_') and val:
                     parts = key.split('_')
-                    p_id = parts[1]
-                    rnd = parts[2]
-                    sub = parts[3]
+                    p_id, rnd, sub = parts[1], parts[2], parts[3]
                     nilai_baru = int(val)
-
-                    # Cek apakah nilai sudah ada sebelumnya?
-                    cek_query = """
-                        SELECT id_penilaian FROM penilaian 
-                        WHERE id_juri = ? AND id_peserta = ? AND round = ? AND sub_round = ?
-                    """
-                    existing = conn.execute(cek_query, (juri_id, p_id, rnd, sub)).fetchone()
-
-                    if existing:
-                        # UPDATE (Revisi Nilai Lama)
-                        conn.execute("""
-                            UPDATE penilaian SET nilai = ? 
-                            WHERE id_penilaian = ?
-                        """, (nilai_baru, existing['id_penilaian']))
-                    else:
-                        # INSERT (Nilai Baru)
-                        conn.execute("""
-                            INSERT INTO penilaian (id_juri, id_peserta, round, sub_round, nilai)
-                            VALUES (?, ?, ?, ?, ?)
-                        """, (juri_id, p_id, rnd, sub, nilai_baru))
-            
+                    existing = conn.execute("SELECT id_penilaian FROM penilaian WHERE id_juri = ? AND id_peserta = ? AND round = ? AND sub_round = ?", (juri_id, p_id, rnd, sub)).fetchone()
+                    if existing: conn.execute("UPDATE penilaian SET nilai = ? WHERE id_penilaian = ?", (nilai_baru, existing['id_penilaian']))
+                    else: conn.execute("INSERT INTO penilaian (id_juri, id_peserta, round, sub_round, nilai) VALUES (?, ?, ?, ?, ?)", (juri_id, p_id, rnd, sub, nilai_baru))
             conn.commit()
             flash('Nilai berhasil disimpan/direvisi!', 'success')
         except Exception as e:
             conn.rollback()
             flash(f'Terjadi kesalahan: {e}', 'error')
-            
         return redirect(url_for('input_nilai'))
-
-    # --- TAMPILKAN HALAMAN INPUT (GET) ---
-    
-    # 1. Ambil semua peserta
     peserta = conn.execute("SELECT * FROM peserta").fetchall()
-    
-    # 2. Ambil nilai yang SUDAH ADA (untuk ditampilkan di kotak input)
     data_nilai = conn.execute("SELECT * FROM penilaian WHERE id_juri = ?", (juri_id,)).fetchall()
-    
-    # Format ke Dictionary agar mudah dipanggil: nilai_dict[(id_peserta, round, sub)] = nilai
-    nilai_dict = {}
-    for row in data_nilai:
-        kunci = (row['id_peserta'], row['round'], row['sub_round'])
-        nilai_dict[kunci] = row['nilai']
-    
+    try: kategori_db = conn.execute("SELECT * FROM kategori_nilai ORDER BY id_kategori ASC").fetchall()
+    except: kategori_db = []
+    nilai_dict = {(row['id_peserta'], row['round'], row['sub_round']): row['nilai'] for row in data_nilai}
     conn.close()
+    return render_template('input_nilai.html', user=session.get('nama'), peserta=peserta, existing_scores=nilai_dict, kategori=kategori_db)
 
-    return render_template('input_nilai.html', user=session.get('nama'), peserta=peserta, existing_scores=nilai_dict)
-
-
-# --- RUTE 4: DASHBOARD KHUSUS PESERTA ---
-@app.route('/dashboard-peserta')
-def dashboard_peserta():
-    if 'user_id' not in session or session.get('role') != 'peserta':
-        flash("Akses ditolak! Halaman ini khusus Peserta.")
-        return redirect(url_for('login'))
-
-    peserta_id = session['user_id']
+# --- NEW: Rute Profil Juri ---
+@app.route('/profil-juri', methods=['GET', 'POST'])
+def profil_juri():
+    if 'user_id' not in session or session.get('role') != 'juri': return redirect(url_for('login'))
     conn = get_db_connection()
-
-    # 1. Ambil Data Profil
-    peserta_info = conn.execute("SELECT * FROM peserta WHERE id_peserta = ?", (peserta_id,)).fetchone()
-
-    # 2. Statistik Umum
-    stats = conn.execute("""
-        SELECT 
-            IFNULL(SUM(nilai), 0) as total,
-            IFNULL(AVG(nilai), 0) as rata_rata,
-            COUNT(nilai) as jumlah_vote
-        FROM penilaian WHERE id_peserta = ?
-    """, (peserta_id,)).fetchone()
-    
-    total_skor = stats['total']
-    rata_rata = stats['rata_rata']
-    jumlah_juri = stats['jumlah_vote']
-
-    # 3. Peringkat
-    query_rank = """
-    SELECT id_peserta, RANK() OVER (ORDER BY SUM(nilai) DESC) as peringkat 
-    FROM penilaian GROUP BY id_peserta
-    """
-    ranks = conn.execute(query_rank).fetchall()
-    my_rank = next((r['peringkat'] for r in ranks if r['id_peserta'] == peserta_id), "-")
-
-    # 4. Chart Data
-    chart_data = conn.execute("""
-        SELECT j.nama_juri, SUM(pn.nilai) as total_dari_juri
-        FROM penilaian pn JOIN juri j ON pn.id_juri = j.id_juri
-        WHERE pn.id_peserta = ? GROUP BY j.nama_juri
-    """, (peserta_id,)).fetchall()
-    labels = [row['nama_juri'] for row in chart_data]
-    values = [row['total_dari_juri'] for row in chart_data]
-
-    # 5. Detail Nilai
-    detail_nilai = conn.execute("""
-        SELECT j.nama_juri, pn.round, pn.sub_round, pn.nilai
-        FROM penilaian pn 
-        JOIN juri j ON pn.id_juri = j.id_juri
-        WHERE pn.id_peserta = ?
-        ORDER BY pn.round DESC, pn.sub_round ASC
-    """, (peserta_id,)).fetchall()
-
-    # --- LOGIKA BARU: Hitung Rata-rata Per Ronde untuk Progress Bar ---
-    # Kita filter data dari 'detail_nilai' yang sudah diambil di atas
-    def hitung_avg_ronde(ronde_ke):
-        nilai_ronde = [d['nilai'] for d in detail_nilai if d['round'] == ronde_ke]
-        if not nilai_ronde: return 0
-        return sum(nilai_ronde) / len(nilai_ronde)
-
-    avg_r1 = hitung_avg_ronde(1)
-    avg_r2 = hitung_avg_ronde(2)
-    avg_r3 = hitung_avg_ronde(3)
-
-    conn.close()
-
-    return render_template('dashboard_peserta.html', 
-                           user=session.get('nama'), 
-                           user_foto=session.get('foto'),
-                           total_skor=total_skor, 
-                           my_rank=my_rank,
-                           rata_rata=rata_rata,
-                           jumlah_juri=jumlah_juri,
-                           detail_nilai=detail_nilai,
-                           chart_labels=json.dumps(labels), 
-                           chart_values=json.dumps(values),
-                           peserta=peserta_info,
-                           avg_r1=avg_r1, 
-                           avg_r2=avg_r2, 
-                           avg_r3=avg_r3)
-
-# --- RUTE TAMBAHAN: LEADERBOARD PESERTA ---
-@app.route('/leaderboard-peserta')
-def leaderboard_peserta():
-    if 'user_id' not in session or session.get('role') != 'peserta':
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    peserta_id = session['user_id'] # Ambil ID kita
-    
-    query = """
-    SELECT 
-        p.id_peserta,
-        p.nama_peserta, 
-        p.foto, 
-        IFNULL(SUM(pn.nilai), 0) as total_skor
-    FROM peserta p
-    LEFT JOIN penilaian pn ON p.id_peserta = pn.id_peserta
-    GROUP BY p.id_peserta
-    ORDER BY total_skor DESC
-    """
-    data = conn.execute(query).fetchall()
-    conn.close()
-
-    # --- LOGIKA BARU: Cari Peringkat Saya untuk Widget Sidebar ---
-    my_rank = "-"
-    my_score = 0
-    
-    # Loop data yang sudah urut skor tertinggi
-    for index, p in enumerate(data):
-        if p['id_peserta'] == peserta_id:
-            my_rank = index + 1
-            my_score = p['total_skor']
-            break # Ketemu, berhenti loop
-            
-    # Pisahkan 3 Besar dan Sisanya
-    top3 = data[:3]
-    rest = data[3:]
-
-    juara1 = top3[0] if len(top3) > 0 else None
-    juara2 = top3[1] if len(top3) > 1 else None
-    juara3 = top3[2] if len(top3) > 2 else None
-
-    # Kirim data tambahan (my_rank, total_skor, user_foto) ke HTML
-    return render_template('leaderboard_peserta.html', 
-                           user=session.get('nama'),
-                           user_foto=session.get('foto'), # Butuh untuk sidebar
-                           my_rank=my_rank,               # Butuh untuk widget
-                           total_skor=my_score,           # Butuh untuk widget
-                           juara1=juara1, juara2=juara2, juara3=juara3,
-                           sisanya=rest)
-
-# --- RUTE BARU: HALAMAN PROFIL PESERTA ---
-@app.route('/profil', methods=['GET', 'POST'])
-def profil():
-    # 1. Cek Login sebagai Peserta
-    if 'user_id' not in session or session.get('role') != 'peserta':
-        flash('Silakan login sebagai peserta terlebih dahulu.')
-        return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    peserta_id = session['user_id']
-    
-    # 2. Jika Form Disubmit (POST)
+    juri_id = session['user_id']
     if request.method == 'POST':
-        nama_baru = request.form['nama']
-        password_baru = request.form['password']
-        
+        nama = request.form['nama']
+        pw = request.form['password']
         try:
-            if password_baru:
-                # Update Nama & Password
-                conn.execute('UPDATE peserta SET nama_peserta = ?, password = ? WHERE id_peserta = ?', 
-                             (nama_baru, password_baru, peserta_id))
-            else:
-                # Update Nama Saja
-                conn.execute('UPDATE peserta SET nama_peserta = ? WHERE id_peserta = ?', 
-                             (nama_baru, peserta_id))
-            
+            if pw: conn.execute('UPDATE juri SET nama_juri = ?, password = ? WHERE id_juri = ?', (nama, pw, juri_id))
+            else: conn.execute('UPDATE juri SET nama_juri = ? WHERE id_juri = ?', (nama, juri_id))
             conn.commit()
-            
-            # Update nama di Session agar header langsung berubah
-            session['nama'] = nama_baru
-            
+            session['nama'] = nama
             flash('Profil berhasil diperbarui!', 'success')
         except Exception as e:
             conn.rollback()
-            flash(f'Terjadi kesalahan: {e}', 'danger')
+            flash(f'Gagal: {e}', 'error')
+    user = conn.execute('SELECT * FROM juri WHERE id_juri = ?', (juri_id,)).fetchone()
+    conn.close()
+    return render_template('profil_juri.html', user=user)
+
+# ==========================================
+# BAGIAN PESERTA
+# ==========================================
+
+@app.route('/dashboard-peserta')
+def dashboard_peserta():
+    if 'user_id' not in session or session.get('role') != 'peserta': return redirect(url_for('login'))
+    peserta_id = session['user_id']
+    conn = get_db_connection()
+    peserta_info = conn.execute("SELECT * FROM peserta WHERE id_peserta = ?", (peserta_id,)).fetchone()
+    stats = conn.execute("SELECT IFNULL(SUM(nilai), 0) as total, IFNULL(AVG(nilai), 0) as rata_rata, COUNT(nilai) as jumlah_vote FROM penilaian WHERE id_peserta = ?", (peserta_id,)).fetchone()
+    ranks = conn.execute("SELECT id_peserta, RANK() OVER (ORDER BY SUM(nilai) DESC) as peringkat FROM penilaian GROUP BY id_peserta").fetchall()
+    my_rank = next((r['peringkat'] for r in ranks if r['id_peserta'] == peserta_id), "-")
+    chart_data = conn.execute("SELECT j.nama_juri, SUM(pn.nilai) as total_dari_juri FROM penilaian pn JOIN juri j ON pn.id_juri = j.id_juri WHERE pn.id_peserta = ? GROUP BY j.nama_juri", (peserta_id,)).fetchall()
+    labels = [row['nama_juri'] for row in chart_data]
+    values = [row['total_dari_juri'] for row in chart_data]
+    detail_nilai = conn.execute("SELECT j.nama_juri, pn.round, pn.sub_round, pn.nilai FROM penilaian pn JOIN juri j ON pn.id_juri = j.id_juri WHERE pn.id_peserta = ? ORDER BY pn.round DESC, pn.sub_round ASC", (peserta_id,)).fetchall()
     
-    # 3. Ambil data terbaru untuk ditampilkan di form
+    try: kategori_db = conn.execute("SELECT * FROM kategori_nilai ORDER BY id_kategori ASC").fetchall()
+    except: kategori_db = []
+    
+    performa_kategori = []
+    for index, kat in enumerate(kategori_db):
+        ronde_ke = index + 1
+        nilai_ronde = [d['nilai'] for d in detail_nilai if d['round'] == ronde_ke]
+        avg = sum(nilai_ronde) / len(nilai_ronde) if nilai_ronde else 0
+        performa_kategori.append({'nama': kat['nama_kategori'], 'avg': avg, 'persen': (avg / 5) * 100})
+
+    conn.close()
+    return render_template('dashboard_peserta.html', user=session.get('nama'), user_foto=session.get('foto'), total_skor=stats['total'], my_rank=my_rank, rata_rata=stats['rata_rata'], jumlah_juri=stats['jumlah_vote'], detail_nilai=detail_nilai, chart_labels=json.dumps(labels), chart_values=json.dumps(values), peserta=peserta_info, performa_kategori=performa_kategori)
+
+@app.route('/leaderboard-peserta')
+def leaderboard_peserta():
+    if 'user_id' not in session or session.get('role') != 'peserta': return redirect(url_for('login'))
+    conn = get_db_connection()
+    peserta_id = session['user_id']
+    data = conn.execute("SELECT p.id_peserta, p.nama_peserta, p.foto, IFNULL(SUM(pn.nilai), 0) as total_skor FROM peserta p LEFT JOIN penilaian pn ON p.id_peserta = pn.id_peserta GROUP BY p.id_peserta ORDER BY total_skor DESC").fetchall()
+    conn.close()
+    my_rank = "-"
+    my_score = 0
+    for index, p in enumerate(data):
+        if p['id_peserta'] == peserta_id:
+            my_rank, my_score = index + 1, p['total_skor']
+            break
+    return render_template('leaderboard_peserta.html', user=session.get('nama'), user_foto=session.get('foto'), my_rank=my_rank, total_skor=my_score, juara1=data[0] if len(data)>0 else None, juara2=data[1] if len(data)>1 else None, juara3=data[2] if len(data)>2 else None, sisanya=data[3:])
+
+@app.route('/profil', methods=['GET', 'POST'])
+def profil():
+    if 'user_id' not in session or session.get('role') != 'peserta': return redirect(url_for('login'))
+    conn = get_db_connection()
+    peserta_id = session['user_id']
+    if request.method == 'POST':
+        nama = request.form['nama']
+        pw = request.form['password']
+        if pw: conn.execute('UPDATE peserta SET nama_peserta = ?, password = ? WHERE id_peserta = ?', (nama, pw, peserta_id))
+        else: conn.execute('UPDATE peserta SET nama_peserta = ? WHERE id_peserta = ?', (nama, peserta_id))
+        conn.commit()
+        session['nama'] = nama
+        flash('Profil berhasil diperbarui!', 'success')
     user = conn.execute('SELECT * FROM peserta WHERE id_peserta = ?', (peserta_id,)).fetchone()
     conn.close()
-    
     return render_template('profil_peserta.html', user=user)
-
-# --- RUTE 5: LOGOUT ---
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)

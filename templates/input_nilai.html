@@ -3,125 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input & Revisi Nilai</title>
+    <title>Input Nilai Juri</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
-        
-        /* Sidebar sama dengan Dashboard Juri */
-        .sidebar { background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%); min-height: 100vh; color: white; }
-        .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
-        .nav-link:hover { background-color: rgba(255,255,255,0.2); color: white; }
-        .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; font-weight: bold; }
-
-        /* Card Style */
-        .card-peserta {
-            background: white; border-radius: 15px; border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
-        }
-        .foto-peserta { width: 60px; height: 60px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; border: 2px solid #4F46E5; }
-        
-        /* Input Style */
-        .input-nilai { 
-            width: 60px; text-align: center; border: 1px solid #ddd; 
-            border-radius: 8px; padding: 5px; font-weight: bold; color: #4F46E5;
-        }
-        .input-nilai:focus { outline: none; border-color: #4F46E5; background-color: #eef2ff; }
-        
-        /* Header Tabel */
-        .th-round { background-color: #f8f9fa; font-size: 0.85rem; text-align: center; }
-        
-        .btn-save {
-            position: fixed; bottom: 30px; right: 30px;
-            background: #4F46E5; color: white; padding: 15px 30px;
-            border-radius: 50px; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
-            font-weight: bold; font-size: 1.1rem; border: none; z-index: 100;
-        }
-        .btn-save:hover { background: #4338ca; transform: translateY(-3px); }
+        body { background-color: #4f46e5; font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; margin: 0; }
+        .sidebar { width: 250px; background-color: #4338ca; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; height: 100vh; }
+        .sidebar-brand { font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 15px; border-radius: 10px; margin-bottom: 5px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .main-content { margin-left: 250px; flex: 1; background-color: #f3f4f6; border-top-left-radius: 30px; border-bottom-left-radius: 30px; padding: 40px; min-height: 100vh; }
+        .card-peserta { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .profile-img { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 3px solid #e0e7ff; }
+        .input-score { text-align: center; font-weight: bold; font-size: 1.1rem; border: 2px solid #e5e7eb; border-radius: 8px; transition: 0.2s; color: #4338ca; }
+        .input-score:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        .table-custom th { font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; color: #6b7280; padding-bottom: 15px; }
+        .table-custom td { padding-top: 15px; padding-bottom: 15px; vertical-align: middle; }
+        .category-label { font-weight: 600; color: #3730a3; font-size: 0.95rem; }
+        .sub-label { font-size: 0.8rem; color: #9ca3af; font-weight: normal; margin-left: 5px; }
+        .floating-btn { position: fixed; bottom: 30px; right: 30px; z-index: 100; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     </style>
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2 sidebar p-4">
-            <h4 class="mb-4 text-center"><i class="fas fa-gavel"></i> JURI APP</h4>
-            <nav class="nav flex-column">
-                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie me-2"></i> Dashboard</a>
-                <a href="{{ url_for('input_nilai') }}" class="nav-link active"><i class="fas fa-edit me-2"></i> Input Nilai</a>
-                <hr>
-                <a href="{{ url_for('logout') }}" class="nav-link text-warning"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <i class="fas fa-gavel"></i> JURI APP
+            </div>
+            <nav>
+                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="{{ url_for('input_nilai') }}" class="nav-link active"><i class="fas fa-edit"></i> Input Nilai</a>
+                <a href="{{ url_for('profil_juri') }}" class="nav-link"><i class="fas fa-user-circle"></i> Profil Saya</a>
             </nav>
         </div>
-
-        <div class="col-md-10 p-5" style="padding-bottom: 100px;">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-dark">Form Penilaian</h2>
-                    <p class="text-muted">Isi atau ubah nilai peserta di bawah ini. Jangan lupa tekan Simpan.</p>
-                </div>
-                
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ 'success' if category=='success' else 'danger' }} py-2 px-4 mb-0">
-                        {{ message }}
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-            </div>
-
-            <form action="{{ url_for('input_nilai') }}" method="POST">
-                
-                {% for p in peserta %}
-                <div class="card-peserta p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{{ url_for('static', filename=p['foto'] if p['foto'] else 'default.jpg') }}" class="foto-peserta me-3">
-                        <h4 class="fw-bold mb-0">{{ p['nama_peserta'] }}</h4>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="th-round bg-light">Sesi</th>
-                                    <th class="th-round">Sub 1</th>
-                                    <th class="th-round">Sub 2</th>
-                                    <th class="th-round">Sub 3</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for r in range(1, 4) %}
-                                <tr>
-                                    <td class="fw-bold text-center align-middle bg-light">Round {{ r }}</td>
-                                    {% for s in range(1, 4) %}
-                                    <td class="text-center p-2">
-                                        <input type="number" 
-                                               name="skor_{{p['id_peserta']}}_{{r}}_{{s}}" 
-                                               class="input-nilai" 
-                                               min="1" max="5" 
-                                               value="{{ existing_scores.get((p['id_peserta'], r, s), '') }}"
-                                               placeholder="-">
-                                    </td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                {% endfor %}
-
-                <button type="submit" class="btn-save">
-                    <i class="fas fa-save me-2"></i> SIMPAN SEMUA REVISI
-                </button>
-
-            </form>
-            </div>
+        <a href="{{ url_for('logout') }}" class="nav-link text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
-</div>
 
+    <div class="main-content">
+        <h3 class="fw-bold text-dark mb-1">Form Penilaian</h3>
+        <p class="text-muted mb-5">Isi atau ubah nilai peserta di bawah ini. Jangan lupa tekan Simpan.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show mb-4 shadow-sm border-0">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('input_nilai') }}" method="POST">
+            
+            {% for p in peserta %}
+            <div class="card-peserta">
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                    <img src="{{ url_for('static', filename=p['foto'] if p['foto'] else 'default.jpg') }}" class="profile-img me-3">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">{{ p['nama_peserta'] }}</h5>
+                        <small class="text-muted">{{ p['perwakilan'] }}</small>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless table-custom align-middle">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="text-start" style="width: 40%;">Sesi Penilaian</th>
+                                <th style="width: 20%;">Sub 1</th>
+                                <th style="width: 20%;">Sub 2</th>
+                                <th style="width: 20%;">Sub 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 4) %}
+                            <tr>
+                                <td>
+                                    {% set nama_kategori = kategori[i-1]['nama_kategori'] if kategori|length >= i else 'Kategori Belum Diatur' %}
+                                    
+                                    <span class="category-label">Round {{ i }}</span>
+                                    <br>
+                                    <span class="text-primary small fw-bold"><i class="fas fa-tag me-1"></i>{{ nama_kategori }}</span>
+                                </td>
+                                <td>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_1" 
+                                           class="form-control input-score" min="1" max="5" 
+                                           value="{{ existing_scores.get((p['id_peserta'], i, 1), '') }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_2" 
+                                           class="form-control input-score" min="1" max="5" 
+                                           value="{{ existing_scores.get((p['id_peserta'], i, 2), '') }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_3" 
+                                           class="form-control input-score" min="1" max="5" 
+                                           value="{{ existing_scores.get((p['id_peserta'], i, 3), '') }}" required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold floating-btn">
+                <i class="fas fa-save me-2"></i> SIMPAN SEMUA REVISI
+            </button>
+
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

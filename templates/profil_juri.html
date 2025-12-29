@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Juri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; margin: 0; }
+        
+        /* SIDEBAR SAMA SEPERTI DASHBOARD */
+        .sidebar { width: 250px; background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%); min-height: 100vh; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; }
+        .sidebar-brand { font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 15px; border-radius: 10px; margin-bottom: 5px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); }
+        
+        .main-content { margin-left: 250px; flex: 1; padding: 40px; width: calc(100% - 250px); }
+        
+        /* STYLE KHUSUS PROFIL */
+        .profile-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .profile-avatar { width: 100px; height: 100px; background: #4F46E5; color: white; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 20px; box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); }
+        .form-control { padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; }
+        .form-control:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .btn-save { background: #4F46E5; color: white; padding: 12px 30px; border-radius: 10px; font-weight: 600; border: none; width: 100%; transition: 0.3s; }
+        .btn-save:hover { background: #3730a3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand"><i class="fas fa-gavel"></i> JURI APP</div>
+            <nav class="nav flex-column">
+                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="{{ url_for('input_nilai') }}" class="nav-link"><i class="fas fa-edit"></i> Input Nilai</a>
+                <a href="{{ url_for('profil_juri') }}" class="nav-link active"><i class="fas fa-user-circle"></i> Profil Saya</a>
+            </nav>
+        </div>
+        <div>
+            <hr class="text-white-50">
+            <a href="{{ url_for('logout') }}" class="nav-link text-danger bg-white bg-opacity-10"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h3 class="fw-bold text-dark mb-4 text-center">Edit Profil</h3>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4" style="max-width: 600px; margin: 0 auto;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="profile-card">
+            <div class="profile-avatar">
+                {{ user['nama_juri'][0] | upper }}
+            </div>
+            
+            <h5 class="text-center fw-bold mb-1">{{ user['nama_juri'] }}</h5>
+            <p class="text-center text-muted mb-4">Username: @{{ user['username'] }}</p>
+
+            <form action="{{ url_for('profil_juri') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-muted">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-user text-primary"></i></span>
+                        <input type="text" name="nama" class="form-control border-start-0" value="{{ user['nama_juri'] }}" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-muted">Password Baru</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-primary"></i></span>
+                        <input type="password" name="password" class="form-control border-start-0" placeholder="Kosongkan jika tidak ingin mengganti">
+                    </div>
+                    <div class="form-text text-muted" style="font-size: 0.8rem;">* Isi hanya jika ingin mengubah password.</div>
+                </div>
+
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i> Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

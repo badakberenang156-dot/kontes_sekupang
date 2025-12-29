@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Idola Karbit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            background-color: #fff1f2; 
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background: linear-gradient(90deg, #be123c 0%, #881337 100%);
+            box-shadow: 0 4px 10px rgba(190, 18, 60, 0.2);
+        }
+
+        /* Kartu Statistik (Dapat Diklik) */
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer; /* Menunjukkan bisa diklik */
+            border: 2px solid transparent;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        /* Efek saat kartu dipilih/aktif */
+        .stat-card.active-card {
+            border-color: #be123c;
+            background-color: #fff0f3;
+        }
+
+        .stat-icon {
+            width: 60px; height: 60px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Konten Panel */
+        .card-panel {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            background: white;
+            height: 100%;
+        }
+        .card-header-custom {
+            padding: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            border: none;
+        }
+
+        /* List & Form */
+        .list-group-item { border: none; border-bottom: 1px solid #f0f0f0; padding: 15px 20px; }
+        .list-group-item:last-child { border-bottom: none; }
+        .form-control { border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px 15px; }
+        .form-control:focus { box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1); border-color: #be123c; }
+
+        .btn-primary-custom { border-radius: 10px; padding: 10px; font-weight: 600; border:none; }
+        
+        .avatar-circle {
+            width: 40px; height: 40px;
+            background-color: #f3f4f6;
+            color: #be123c;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        /* Animasi Transisi */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark navbar-custom mb-5">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1 fw-bold">
+            <i class="fas fa-crown me-2 text-warning"></i>Admin Panel Idola Karbit
+        </span>
+        <div class="d-flex align-items-center text-white">
+            <span class="me-3 d-none d-md-block">Halo, Admin!</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm rounded-pill px-4 fw-bold text-danger">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm rounded-3 border-0 mb-4">
+                    <i class="fas fa-info-circle me-2"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="stat-card active-card" onclick="showSection('peserta')" id="card-peserta">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Manajemen</h6>
+                    <h4 class="fw-bold mb-0 text-primary">Data Peserta</h4>
+                    <span class="badge bg-primary mt-2">{{ peserta|length }} Orang</span>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" onclick="showSection('juri')" id="card-juri">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Manajemen</h6>
+                    <h4 class="fw-bold mb-0 text-success">Data Juri</h4>
+                    <span class="badge bg-success mt-2">{{ juri|length }} Orang</span>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-gavel"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" onclick="showSection('kategori')" id="card-kategori">
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Pengaturan</h6>
+                    <h4 class="fw-bold mb-0 text-warning">Kategori Nilai</h4>
+                    <span class="badge bg-warning text-dark mt-2">{{ kategori|length }} Aspek</span>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            
+            <div id="section-peserta" class="content-section fade-in">
+                <div class="card-panel">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                        <span><i class="fas fa-user-graduate me-2"></i>Kelola Data Peserta</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-5 border-end">
+                                <h5 class="fw-bold mb-3 text-primary">Tambah Peserta Baru</h5>
+                                <form action="{{ url_for('tambah_peserta') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label small text-muted">Nama Lengkap</label>
+                                        <input type="text" name="nama" class="form-control" placeholder="Contoh: Mai Sakurajima" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small text-muted">Perwakilan dari</label>
+                                        <input type="text" name="sekolah" class="form-control" placeholder="Contoh:  Bunny Girl ">
+                                    </div>
+                                    <div class="row g-2 mb-4">
+                                        <div class="col">
+                                            <label class="form-label small text-muted">Username</label>
+                                            <input type="text" name="username" class="form-control" required>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label small text-muted">Password</label>
+                                            <input type="text" name="password" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 btn-primary-custom" style="background-color: #2563eb;">
+                                        <i class="fas fa-save me-2"></i> Simpan Data
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-7 ps-md-4">
+                                <h5 class="fw-bold mb-3 text-muted">Daftar Peserta Terdaftar</h5>
+                                <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                                    {% for p in peserta %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle text-primary bg-primary bg-opacity-10">
+                                                {{ p['nama_peserta'][0] }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ p['nama_peserta'] }}</div>
+                                                <div class="small text-muted">
+                                                    <i class="fas fa-flag me-1"></i> {{ p['asal_sekolah'] }} &bull; 
+                                                    User: {{ p['username'] }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="{{ url_for('hapus_data', tipe='peserta', id_data=p['id_peserta']) }}" class="btn btn-light btn-sm text-danger shadow-sm" onclick="return confirm('Hapus peserta ini?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center py-4 text-muted">Belum ada data peserta.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-juri" class="content-section d-none fade-in">
+                <div class="card-panel">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <i class="fas fa-user-tie me-2"></i>Kelola Data Juri
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-5 border-end">
+                                <h5 class="fw-bold mb-3 text-success">Tambah Juri Baru</h5>
+                                <form action="{{ url_for('tambah_juri') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label small text-muted">Nama Juri</label>
+                                        <input type="text" name="nama" class="form-control" required>
+                                    </div>
+                                    <div class="row g-2 mb-4">
+                                        <div class="col">
+                                            <label class="form-label small text-muted">Username</label>
+                                            <input type="text" name="username" class="form-control" required>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label small text-muted">Password</label>
+                                            <input type="text" name="password" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100 btn-primary-custom" style="background-color: #059669;">
+                                        <i class="fas fa-save me-2"></i> Simpan Juri
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-7 ps-md-4">
+                                <h5 class="fw-bold mb-3 text-muted">Daftar Dewan Juri</h5>
+                                <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                                    {% for j in juri %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle text-success bg-success bg-opacity-10">
+                                                {{ j['nama_juri'][0] }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ j['nama_juri'] }}</div>
+                                                <div class="small text-muted"><i class="fas fa-key me-1"></i> User: {{ j['username'] }}</div>
+                                            </div>
+                                        </div>
+                                        <a href="{{ url_for('hapus_data', tipe='juri', id_data=j['id_juri']) }}" class="btn btn-light btn-sm text-danger shadow-sm" onclick="return confirm('Hapus juri ini?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-kategori" class="content-section d-none fade-in">
+                <div class="card-panel">
+                    <div class="card-header-custom" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <i class="fas fa-sliders-h me-2"></i>Pengaturan Kategori Nilai
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-5 border-end">
+                                <h5 class="fw-bold mb-3 text-warning">Tambah Kategori</h5>
+                                <form action="{{ url_for('tambah_kategori') }}" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label small text-muted">Nama Kategori</label>
+                                        <input type="text" name="nama" class="form-control" placeholder="Misal: Teknik Vokal" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label small text-muted">Skor Maksimal (1-5)</label>
+                                        <input type="number" name="bobot" class="form-control" min="1" max="5" placeholder="Misal: 5" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning w-100 btn-primary-custom" style="background-color: #d97706; color: white;">
+                                        <i class="fas fa-plus-circle me-2"></i> Tambah Kategori
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-7 ps-md-4">
+                                <h5 class="fw-bold mb-3 text-muted">Kategori Aktif</h5>
+                                <div class="list-group list-group-flush">
+                                    {% for k in kategori %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle text-warning bg-warning bg-opacity-10">
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ k['nama_kategori'] }}</div>
+                                                <div class="badge bg-warning text-dark">Max: {{ k['bobot_persen'] }} Poin</div>
+                                            </div>
+                                        </div>
+                                        <a href="{{ url_for('hapus_data', tipe='kategori', id_data=k['id_kategori']) }}" class="btn btn-light btn-sm text-danger shadow-sm" onclick="return confirm('Hapus kategori ini?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showSection(sectionId) {
+        document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
+        document.getElementById('section-' + sectionId).classList.remove('d-none');
+        document.querySelectorAll('.stat-card').forEach(el => el.classList.remove('active-card'));
+        document.getElementById('card-' + sectionId).classList.add('active-card');
+    }
+</script>
+</body>
+</html>

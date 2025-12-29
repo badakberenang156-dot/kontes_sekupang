@@ -1,56 +1,39 @@
 import sqlite3
 
-def update_database():
-    # Nama file database kamu
+def ganti_nama_kolom():
     db_file = 'database2.db'
-    
-    # Koneksi ke database
     conn = sqlite3.connect(db_file)
-    cursor = conn.cursor()
-    
-    print("--- 🔨 MEMULAI RENOVASI DATABASE ---")
+    c = conn.cursor()
 
-    # BAGIAN 1: MENAMBAH KOLOM BARU
-    # Kita pakai 'try-except' supaya kalau kamu tidak sengaja run 2x, program tidak error
-    try:
-        cursor.execute("ALTER TABLE juri ADD COLUMN username TEXT")
-        print("✅ Kolom 'username' berhasil dibuat.")
-    except sqlite3.OperationalError:
-        print("ℹ️  Kolom 'username' sudah ada (dilewati).")
-
-    try:
-        cursor.execute("ALTER TABLE juri ADD COLUMN password TEXT")
-        print("✅ Kolom 'password' berhasil dibuat.")
-    except sqlite3.OperationalError:
-        print("ℹ️  Kolom 'password' sudah ada (dilewati).")
-
-    # BAGIAN 2: MENGISI DATA OTOMATIS
-    # Kita tidak mau username & password kosong (NULL).
-    # Jadi kita buatkan otomatis berdasarkan nama juri.
+    print("--- MIGRASI KOLOM DATABASE ---")
     
-    cursor.execute("SELECT id_juri, nama_juri FROM juri")
-    semua_juri = cursor.fetchall()
+    # Cek daftar kolom saat ini
+    c.execute("PRAGMA table_info(peserta)")
+    columns = [col[1] for col in c.fetchall()]
     
-    print("\n--- 📝 UPDATE DATA JURI LAMA ---")
-    
-    for juri in semua_juri:
-        id_juri = juri[0]
-        nama_asli = juri[1]
+    if 'asal_sekolah' in columns:
+        print("Ditemukan kolom 'asal_sekolah'. Mengubah menjadi 'perwakilan'...")
+        try:
+            # Perintah untuk mengganti nama kolom
+            c.execute("ALTER TABLE peserta RENAME COLUMN asal_sekolah TO perwakilan")
+            conn.commit()
+            print("[SUKSES] Kolom berhasil diubah menjadi 'perwakilan'.")
+        except Exception as e:
+            print(f"[ERROR] Gagal mengubah nama kolom: {e}")
+            
+    elif 'perwakilan' in columns:
+        print("[INFO] Kolom sudah bernama 'perwakilan'. Tidak perlu perubahan.")
         
-        # Logika: Nama "Mai Sakurajima" -> username "maisakurajima", password "123"
-        username_baru = nama_asli.lower().replace(" ", "")
-        password_default = "123" 
-        
-        # Masukkan ke database
-        query = "UPDATE juri SET username = ?, password = ? WHERE id_juri = ?"
-        cursor.execute(query, (username_baru, password_default, id_juri))
-        
-        print(f"👉 {nama_asli} \t-> Username: {username_baru} | Pass: {password_default}")
+    else:
+        print("Kolom 'asal_sekolah' tidak ditemukan. Membuat kolom 'perwakilan' baru...")
+        try:
+            c.execute("ALTER TABLE peserta ADD COLUMN perwakilan TEXT")
+            conn.commit()
+            print("[SUKSES] Kolom 'perwakilan' berhasil ditambahkan.")
+        except Exception as e:
+            print(f"[ERROR] Gagal menambah kolom: {e}")
 
-    # Simpan perubahan permanen
-    conn.commit()
     conn.close()
-    print("\n🎉 SUKSES! Database 'database2.db' sudah siap untuk fitur Login.")
 
-if __name__ == "__main__":
-    update_database()
+if __name__ == '__main__':
+    ganti_nama_kolom()
