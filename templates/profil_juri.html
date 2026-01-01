@@ -7,19 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
     <style>
         body { background-color: #f3f4f6; font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        
-        /* SIDEBAR SAMA SEPERTI DASHBOARD */
-        .sidebar { width: 250px; background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%); min-height: 100vh; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; }
+        .sidebar { width: 250px; background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%); min-height: 100vh; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; z-index: 1000; }
         .sidebar-brand { font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 15px; border-radius: 10px; margin-bottom: 5px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 15px; border-radius: 10px; margin-bottom: 5px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; cursor: pointer; }
         .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.2); color: white; transform: translateX(5px); }
-        
         .main-content { margin-left: 250px; flex: 1; padding: 40px; width: calc(100% - 250px); }
-        
-        /* STYLE KHUSUS PROFIL */
         .profile-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
         .profile-avatar { width: 100px; height: 100px; background: #4F46E5; color: white; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 20px; box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3); }
         .form-control { padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; }
@@ -32,11 +26,15 @@
 
     <div class="sidebar">
         <div>
-            <div class="sidebar-brand"><i class="fas fa-gavel"></i> JURI APP</div>
+            <div class="sidebar-brand"><i class="fas fa-vote-yea me-2"></i> JURI APP</div>
             <nav class="nav flex-column">
                 <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
                 <a href="{{ url_for('input_nilai') }}" class="nav-link"><i class="fas fa-edit"></i> Input Nilai</a>
                 <a href="{{ url_for('profil_juri') }}" class="nav-link active"><i class="fas fa-user-circle"></i> Profil Saya</a>
+                
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#infoModal">
+                    <i class="fas fa-info-circle"></i> Info Penilaian
+                </a>
             </nav>
         </div>
         <div>
@@ -89,6 +87,48 @@
                     <i class="fas fa-save me-2"></i> Simpan Perubahan
                 </button>
             </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #be123c 0%, #881337 100%); border-bottom: 4px solid #fbbf24;">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-book-open me-2"></i>Panduan & Kriteria Penilaian</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6 border-end">
+                            <h6 class="fw-bold text-danger mb-3 text-uppercase"><i class="fas fa-star-half-alt me-2"></i>Skala Skor (1-5)</h6>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-success me-3" style="width: 40px; font-size: 1rem;">5</span><div><strong class="text-dark">Sempurna (Perfect)</strong><div class="text-muted small">Eksekusi tanpa cela, memukau.</div></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-primary me-3" style="width: 40px; font-size: 1rem;">4</span><div><strong class="text-dark">Sangat Baik (Excellent)</strong><div class="text-muted small">Teknik kuat, sedikit kesalahan minor.</div></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-info text-dark me-3" style="width: 40px; font-size: 1rem;">3</span><div><strong class="text-dark">Cukup (Average)</strong><div class="text-muted small">Penampilan standar, memenuhi syarat dasar.</div></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-warning text-dark me-3" style="width: 40px; font-size: 1rem;">2</span><div><strong class="text-dark">Kurang (Poor)</strong><div class="text-muted small">Banyak kesalahan, perlu latihan lagi.</div></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-danger me-3" style="width: 40px; font-size: 1rem;">1</span><div><strong class="text-dark">Sangat Kurang (Bad)</strong><div class="text-muted small">Gagal mengeksekusi penampilan.</div></div></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-danger mb-3 text-uppercase"><i class="fas fa-list-check me-2"></i>Aspek Penilaian</h6>
+                                <ul class="list-group list-group-flush small">
+                                    {% for k in kategori %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span><i class="fas fa-tag text-secondary me-2"></i>{{ k['nama_kategori'] }}</span>
+                                        <span class="badge bg-secondary rounded-pill">Max 5.0 Poin</span>
+                                    </li>
+                                    {% else %}
+                                    <li class="list-group-item text-muted text-center">Belum ada kategori.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="alert alert-warning border-0 d-flex align-items-start mb-0"><i class="fas fa-exclamation-triangle mt-1 me-3"></i><div class="small"><strong>Catatan Penting:</strong><br>Nilai bersifat <em>Real-time</em>. Skor dapat berubah sewaktu-waktu jika Juri melakukan revisi sebelum batas waktu ronde berakhir.</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0"><button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Saya Mengerti</button></div>
+            </div>
         </div>
     </div>
 

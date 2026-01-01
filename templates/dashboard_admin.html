@@ -87,6 +87,9 @@
         /* Animasi Transisi */
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Style untuk request password */
+        .req-card { border-left: 4px solid #f59e0b; background: #fffbeb; }
     </style>
 </head>
 <body>
@@ -118,6 +121,53 @@
         {% endif %}
     {% endwith %}
 
+    {% if requests %}
+    <div class="card card-panel req-card mb-5">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-warning bg-opacity-25 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-dark mb-0">Permintaan Ganti Password</h5>
+                    <small class="text-muted">Ada user yang ingin mengganti password mereka.</small>
+                </div>
+            </div>
+
+            <div class="table-responsive bg-white rounded-3 p-3 shadow-sm border">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead class="text-muted small fw-bold text-uppercase border-bottom">
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Tipe User</th>
+                            <th>Nama</th>
+                            <th>Password Baru</th>
+                            <th class="text-end">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in requests %}
+                        <tr class="border-bottom">
+                            <td class="text-muted small">{{ r['tanggal'] }}</td>
+                            <td><span class="badge bg-secondary">{{ r['tipe_user']|upper }}</span></td>
+                            <td class="fw-bold text-dark">{{ r['nama_user'] }}</td>
+                            <td class="text-muted fst-italic">****** (Disembunyikan)</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('respon_password', id_req=r['id_request'], action='terima') }}" class="btn btn-success btn-sm rounded-3 me-2 fw-bold" title="Setujui">
+                                    <i class="fas fa-check me-1"></i> Terima
+                                </a>
+                                <a href="{{ url_for('respon_password', id_req=r['id_request'], action='tolak') }}" class="btn btn-danger btn-sm rounded-3 fw-bold" title="Tolak">
+                                    <i class="fas fa-times me-1"></i> Tolak
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="row mb-4 g-3">
         <div class="col-md-4">
             <div class="stat-card active-card" onclick="showSection('peserta')" id="card-peserta">
