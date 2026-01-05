@@ -9,21 +9,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; min-height: 100vh; margin: 0; }
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; }
         
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (Desktop Default) --- */
         .sidebar {
             width: 250px;
             background: linear-gradient(180deg, #4F46E5 0%, #3730a3 100%);
-            min-height: 100vh;
+            height: 100vh;
             color: white;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
+            top: 0;
+            left: 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between; 
             padding: 20px;
-            z-index: 1000;
+            z-index: 1050;
+            transition: all 0.3s ease-in-out;
         }
         
         .sidebar-brand { 
@@ -58,88 +61,103 @@
         /* --- MAIN CONTENT --- */
         .main-content { 
             margin-left: 250px; 
-            flex: 1; 
             padding: 30px; 
             width: calc(100% - 250px);
+            transition: all 0.3s ease-in-out;
         }
         
+        /* --- MOBILE NAV (Hanya Muncul di HP) --- */
+        .mobile-nav {
+            display: none;
+            background: #4F46E5;
+            padding: 15px 20px;
+            color: white;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1045;
+        }
+
+        /* --- RESPONSIVE CSS --- */
+        @media (max-width: 768px) {
+            .sidebar { left: -250px; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+            .mobile-nav { display: flex; }
+            .sidebar-overlay.active { display: block; }
+        }
+        
+        /* --- Styles Lain --- */
         .header-welcome { margin-bottom: 30px; }
+        .profile-badge { transition: all 0.3s ease; border: 1px solid transparent; }
+        .profile-badge:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2) !important; border-color: #4F46E5; cursor: pointer; }
         
-        .profile-badge {
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-        .profile-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2) !important;
-            border-color: #4F46E5;
-            cursor: pointer;
-        }
-        
-        /* Cards */
         .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-            border: none;
-            position: relative;
-            overflow: hidden;
-            height: 100%;
+            background: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;
+            border: none; position: relative; overflow: hidden; height: 100%;
         }
         .clickable-card { cursor: pointer; transition: all 0.3s ease; }
         .clickable-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(79, 70, 229, 0.2); border: 1px solid #4F46E5; }
         
-        .icon-box {
-            width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; margin-bottom: 15px;
-        }
+        .icon-box { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; margin-bottom: 15px; }
         
-        /* Table */
         .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%; }
         .custom-table th { background-color: #f8f9fa; border-bottom: 2px solid #e9ecef; position: sticky; top: 0; }
-        
         .modal-peserta-img { width: 50px; height: 50px; object-fit: cover; object-position: 50% 5%; border-radius: 50%; border: 2px solid #4F46E5; }
 
-        /* --- PRINT STYLES --- */
         @media print {
             body * { visibility: hidden; }
             #modalRataRata, #modalRataRata * { visibility: visible; }
-            #modalRataRata { position: absolute; left: 0; top: 0; width: 100%; height: auto; margin: 0; padding: 0; background: white !important; border: none !important; overflow: visible !important; }
-            .modal-dialog { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; }
-            .modal-content { border: none !important; box-shadow: none !important; }
-            .table-responsive { max-height: none !important; overflow: visible !important; height: auto !important; }
-            .no-print, .btn-close, .btn-secondary { display: none !important; }
-            .table { border: 1px solid #000 !important; width: 100% !important; }
-            .table th, .table td { border: 1px solid #000 !important; color: #000 !important; }
-            .badge { background: none !important; color: #000 !important; border: 1px solid #000 !important; padding: 2px 5px; }
+            #modalRataRata { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white !important; }
+            .no-print, .mobile-nav, .sidebar { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="mySidebar">
         <div>
+            <div class="d-flex justify-content-between align-items-center d-md-none mb-3">
+                <div class="fw-bold">Menu</div>
+                <button class="btn btn-sm btn-outline-light border-0" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+            </div>
+
             <div class="sidebar-brand"><i class="fas fa-vote-yea me-2"></i>JURI APP</div>
             <nav class="nav flex-column">
                 <a href="#" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
                 <a href="{{ url_for('input_nilai') }}" class="nav-link"><i class="fas fa-edit"></i> Input Nilai</a> 
                 <a href="{{ url_for('profil_juri') }}" class="nav-link"><i class="fas fa-user-circle"></i> Profil Saya</a>
-                
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#infoModal">
-                    <i class="fas fa-info-circle"></i> Info Penilaian
-                </a>
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#infoModal"><i class="fas fa-info-circle"></i> Info Penilaian</a>
             </nav>
         </div>
-
         <div>
             <hr class="text-white-50">
             <a href="{{ url_for('logout') }}" class="nav-link text-danger bg-white bg-opacity-10"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
 
+    <div class="mobile-nav">
+        <div class="fw-bold fs-5"><i class="fas fa-vote-yea me-2"></i>JURI APP</div>
+        <button class="btn btn-link text-white p-0 text-decoration-none" onclick="toggleSidebar()">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+
     <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center header-welcome">
+        <div class="d-flex justify-content-between align-items-center header-welcome flex-wrap gap-2">
             <div>
                 <h2 class="fw-bold text-dark">Dashboard Penilaian</h2>
                 <p class="text-muted mb-0">Halo, <strong>{{ user }}</strong>! Berikut performa penilaian Anda.</p>
@@ -193,9 +211,14 @@
             <div class="col-lg-8">
                 <div class="stat-card h-100">
                     <h5 class="fw-bold mb-4">Grafik Sebaran Nilai Anda</h5>
-                    <canvas id="scoreChart" height="150"></canvas>
+                    
+                    <div style="height: 350px; position: relative; width: 100%;">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+
                 </div>
             </div>
+
             <div class="col-lg-4">
                 <div class="table-container">
                     <h5 class="fw-bold mb-3">Riwayat Penilaian</h5>
@@ -325,6 +348,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Toggle Sidebar Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mySidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Konfigurasi Chart
         const ctx = document.getElementById('scoreChart').getContext('2d');
         const labels = {{ chart_labels | safe }};
         const dataValues = {{ chart_values | safe }};
@@ -342,6 +374,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // Wajib false agar ikut tinggi div pembungkus
                 plugins: { legend: { display: false } },
                 scales: {
                     y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
@@ -350,6 +383,5 @@
             }
         });
     </script>
-
 </body>
 </html>

@@ -8,30 +8,179 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #4f46e5; font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; margin: 0; }
-        .sidebar { width: 250px; background-color: #4338ca; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: fixed; height: 100vh; z-index: 1000; }
+        :root {
+            --primary-color: #4f46e5;
+            --sidebar-color: #4338ca;
+            --bg-color: #f3f4f6;
+            --accent-blue: #0ea5e9; /* Warna biru muda dashboard */
+            --sidebar-width: 250px;
+        }
+        
+        body { 
+            background-color: var(--primary-color); 
+            font-family: 'Poppins', sans-serif; 
+            display: flex; 
+            min-height: 100vh; 
+            margin: 0; 
+            overflow-x: hidden;
+        }
+
+        /* --- SIDEBAR STYLES --- */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            background-color: var(--sidebar-color); 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            position: fixed; 
+            height: 100vh; 
+            z-index: 1000; 
+            transition: all 0.3s ease-in-out;
+        }
+
         .sidebar-brand { font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
         .nav-link { color: rgba(255,255,255,0.7); padding: 12px 15px; border-radius: 10px; margin-bottom: 5px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.3s; cursor: pointer; }
         .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.1); color: white; }
-        .main-content { margin-left: 250px; flex: 1; background-color: #f3f4f6; border-top-left-radius: 30px; border-bottom-left-radius: 30px; padding: 40px; min-height: 100vh; }
+
+        /* --- MAIN CONTENT STYLES --- */
+        .main-content { 
+            margin-left: var(--sidebar-width); 
+            flex: 1; 
+            width: calc(100% - var(--sidebar-width));
+            background-color: var(--bg-color); 
+            border-top-left-radius: 30px; 
+            border-bottom-left-radius: 30px; 
+            padding: 40px; 
+            min-height: 100vh; 
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* --- PROFILE PILL STYLE (Mirip Dashboard) --- */
+        .profile-pill {
+            background: white;
+            padding: 5px 15px 5px 5px; /* Kanan lebih lebar utk nama */
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            height: 48px;
+        }
+
+        .profile-pill:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+            background: #fff;
+        }
+
+        .avatar-circle {
+            width: 38px;
+            height: 38px;
+            background-color: var(--accent-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-name {
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* --- CARD & INPUT STYLES --- */
         .card-peserta { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .profile-img { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 3px solid #e0e7ff; }
-        .input-score { text-align: center; font-weight: bold; font-size: 1.1rem; border: 2px solid #e5e7eb; border-radius: 8px; transition: 0.2s; color: #4338ca; }
+        
+        .input-score { 
+            text-align: center; font-weight: bold; font-size: 1.1rem; 
+            border: 2px solid #e5e7eb; border-radius: 12px; height: 50px;
+            transition: 0.2s; color: #4338ca; 
+        }
         .input-score:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        
         .table-custom th { font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; color: #6b7280; padding-bottom: 15px; }
         .table-custom td { padding-top: 15px; padding-bottom: 15px; vertical-align: middle; }
         .category-label { font-weight: 600; color: #3730a3; font-size: 0.95rem; }
-        .sub-label { font-size: 0.8rem; color: #9ca3af; font-weight: normal; margin-left: 5px; }
+        
         .floating-btn { position: fixed; bottom: 30px; right: 30px; z-index: 100; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); animation: bounce 2s infinite; }
+        
+        /* --- MOBILE & TOP BAR --- */
+        .mobile-top-bar {
+            position: fixed; top: 0; left: 0; right: 0; height: 75px;
+            background-color: var(--primary-color); z-index: 900;
+            display: none; align-items: center; padding: 0 20px;
+            color: white; justify-content: space-between;
+        }
+
+        .sidebar-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; transition: opacity 0.3s;
+        }
+
+        /* --- RESPONSIVE STYLES --- */
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+            .sidebar.show { transform: translateX(0); }
+
+            .main-content {
+                margin-left: 0; width: 100%;
+                border-radius: 0; padding: 20px;
+                border-top-left-radius: 20px; border-top-right-radius: 20px;
+                margin-top: 70px; /* Jarak untuk header mobile */
+            }
+
+            .mobile-top-bar { display: flex; }
+            .sidebar-overlay.show { display: block; opacity: 1; }
+
+            .table-custom th, .table-custom td { padding: 8px 4px; }
+            .profile-img { width: 45px; height: 45px; }
+            h5 { font-size: 1rem; }
+            .floating-btn { bottom: 20px; right: 20px; padding: 10px 20px !important; font-size: 0.9rem; }
+            
+            .desktop-header-text { display: none; }
+        }
+
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="d-lg-none mobile-top-bar">
+        <div class="d-flex align-items-center">
+            <button class="btn text-white me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+            <span class="fw-bold fs-5">JURI APP</span>
+        </div>
+        
+        <a href="{{ url_for('profil_juri') }}" class="profile-pill border-0 shadow-sm">
+            <div class="avatar-circle">
+                {{ user[:2] | upper if user else 'JU' }}
+            </div>
+            <span class="profile-name d-none d-sm-block">{{ user if user else 'Juri' }}</span>
+        </a>
+    </div>
+
+    <div class="sidebar" id="sidebar">
         <div>
             <div class="sidebar-brand">
                 <i class="fas fa-gavel"></i> JURI APP
+                <button class="btn text-white d-lg-none ms-auto" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <nav>
                 <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
@@ -47,8 +196,19 @@
     </div>
 
     <div class="main-content">
-        <h3 class="fw-bold text-dark mb-1">Form Penilaian</h3>
-        <p class="text-muted mb-5">Isi atau ubah nilai peserta di bawah ini. Jangan lupa tekan Simpan.</p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="desktop-header-text">
+                <h3 class="fw-bold text-dark mb-1">Form Penilaian</h3>
+                <p class="text-muted mb-0">Isi nilai peserta di bawah ini.</p>
+            </div>
+            
+            <a href="{{ url_for('profil_juri') }}" class="profile-pill d-none d-lg-inline-flex">
+                <div class="avatar-circle">
+                    {{ user[:2] | upper if user else 'JU' }}
+                </div>
+                <span class="profile-name">{{ user if user else 'Juri' }}</span>
+            </a>
+        </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -77,7 +237,7 @@
                     <table class="table table-borderless table-custom align-middle">
                         <thead>
                             <tr class="text-center">
-                                <th class="text-start" style="width: 40%;">Sesi Penilaian</th>
+                                <th class="text-start" style="width: 35%;">Sesi</th>
                                 <th style="width: 20%;">Sub 1</th>
                                 <th style="width: 20%;">Sub 2</th>
                                 <th style="width: 20%;">Sub 3</th>
@@ -87,19 +247,18 @@
                             {% for i in range(1, 4) %}
                             <tr>
                                 <td>
-                                    {% set nama_kategori = kategori[i-1]['nama_kategori'] if kategori|length >= i else 'Kategori Belum Diatur' %}
-                                    <span class="category-label">Round {{ i }}</span>
-                                    <br>
-                                    <span class="text-primary small fw-bold"><i class="fas fa-tag me-1"></i>{{ nama_kategori }}</span>
+                                    {% set nama_kategori = kategori[i-1]['nama_kategori'] if kategori|length >= i else 'Belum Diatur' %}
+                                    <span class="category-label d-block">Round {{ i }}</span>
+                                    <span class="text-primary small fw-bold text-nowrap"><i class="fas fa-tag me-1"></i>{{ nama_kategori }}</span>
                                 </td>
                                 <td>
-                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_1" class="form-control input-score" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 1), '') }}" required>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_1" class="form-control input-score" placeholder="-" inputmode="numeric" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 1), '') }}" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_2" class="form-control input-score" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 2), '') }}" required>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_2" class="form-control input-score" placeholder="-" inputmode="numeric" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 2), '') }}" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_3" class="form-control input-score" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 3), '') }}" required>
+                                    <input type="number" name="skor_{{ p['id_peserta'] }}_{{ i }}_3" class="form-control input-score" placeholder="-" inputmode="numeric" min="1" max="5" value="{{ existing_scores.get((p['id_peserta'], i, 3), '') }}" required>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -109,8 +268,8 @@
             </div>
             {% endfor %}
 
-            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold floating-btn">
-                <i class="fas fa-save me-2"></i> SIMPAN SEMUA REVISI
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold floating-btn">
+                <i class="fas fa-save me-2"></i> SIMPAN
             </button>
 
         </form>
@@ -120,7 +279,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header text-white" style="background: linear-gradient(135deg, #be123c 0%, #881337 100%); border-bottom: 4px solid #fbbf24;">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-book-open me-2"></i>Panduan & Kriteria Penilaian</h5>
+                    <h5 class="modal-title fw-bold"><i class="fas fa-book-open me-2"></i>Panduan Penilaian</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -128,36 +287,38 @@
                         <div class="col-md-6 border-end">
                             <h6 class="fw-bold text-danger mb-3 text-uppercase"><i class="fas fa-star-half-alt me-2"></i>Skala Skor (1-5)</h6>
                             <div class="d-flex flex-column gap-2">
-                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-success me-3" style="width: 40px; font-size: 1rem;">5</span><div><strong class="text-dark">Sempurna (Perfect)</strong><div class="text-muted small">Eksekusi tanpa cela, memukau.</div></div></div>
-                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-primary me-3" style="width: 40px; font-size: 1rem;">4</span><div><strong class="text-dark">Sangat Baik (Excellent)</strong><div class="text-muted small">Teknik kuat, sedikit kesalahan minor.</div></div></div>
-                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-info text-dark me-3" style="width: 40px; font-size: 1rem;">3</span><div><strong class="text-dark">Cukup (Average)</strong><div class="text-muted small">Penampilan standar, memenuhi syarat dasar.</div></div></div>
-                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-warning text-dark me-3" style="width: 40px; font-size: 1rem;">2</span><div><strong class="text-dark">Kurang (Poor)</strong><div class="text-muted small">Banyak kesalahan, perlu latihan lagi.</div></div></div>
-                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-danger me-3" style="width: 40px; font-size: 1rem;">1</span><div><strong class="text-dark">Sangat Kurang (Bad)</strong><div class="text-muted small">Gagal mengeksekusi penampilan.</div></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-success me-3" style="width: 40px;">5</span><div><strong class="text-dark">Sempurna</strong></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-primary me-3" style="width: 40px;">4</span><div><strong class="text-dark">Sangat Baik</strong></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-info text-dark me-3" style="width: 40px;">3</span><div><strong class="text-dark">Cukup</strong></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-warning text-dark me-3" style="width: 40px;">2</span><div><strong class="text-dark">Kurang</strong></div></div>
+                                <div class="d-flex align-items-center bg-light p-2 rounded border"><span class="badge bg-danger me-3" style="width: 40px;">1</span><div><strong class="text-dark">Buruk</strong></div></div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-4">
-                                <h6 class="fw-bold text-danger mb-3 text-uppercase"><i class="fas fa-list-check me-2"></i>Aspek Penilaian</h6>
-                                <ul class="list-group list-group-flush small">
-                                    {% for k in kategori %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                        <span><i class="fas fa-tag text-secondary me-2"></i>{{ k['nama_kategori'] }}</span>
-                                        <span class="badge bg-secondary rounded-pill">Max 5.0 Poin</span>
-                                    </li>
-                                    {% else %}
-                                    <li class="list-group-item text-muted text-center">Belum ada kategori.</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            <div class="alert alert-warning border-0 d-flex align-items-start mb-0"><i class="fas fa-exclamation-triangle mt-1 me-3"></i><div class="small"><strong>Catatan Penting:</strong><br>Nilai bersifat <em>Real-time</em>. Skor dapat berubah sewaktu-waktu jika Juri melakukan revisi sebelum batas waktu ronde berakhir.</div></div>
+                            <h6 class="fw-bold text-danger mb-3 text-uppercase"><i class="fas fa-list-check me-2"></i>Kategori</h6>
+                            <ul class="list-group list-group-flush small">
+                                {% for k in kategori %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span><i class="fas fa-tag text-secondary me-2"></i>{{ k['nama_kategori'] }}</span>
+                                </li>
+                                {% else %}
+                                <li class="list-group-item text-muted text-center">Belum ada kategori.</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light border-0"><button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Saya Mengerti</button></div>
+                <div class="modal-footer bg-light border-0"><button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Tutup</button></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+    </script>
 </body>
 </html>

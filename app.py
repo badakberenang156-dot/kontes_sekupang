@@ -362,6 +362,8 @@ def profil():
     conn.close()
     return render_template('profil_peserta.html', user=user)
 
+
+
 if __name__ == '__main__':
     # --- AUTO-CREATE TABLE SAAT STARTUP ---
     init_db()
